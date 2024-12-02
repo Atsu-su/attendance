@@ -28,8 +28,8 @@
       @error('confirm_password')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <button class="form-btn c-btn c-btn--red" type="submit">登録する</button>
+      <button class="form-btn c-btn c-btn--black c-btn--auth" type="submit">登録する</button>
     </form>
-    <a class="login-link u-opacity-08" href="{{ route('login') }}">ログインはこちら</a>
+    <a class="login-link" href="{{ route('login') }}">ログインはこちら</a>
   </div>
 @endsection

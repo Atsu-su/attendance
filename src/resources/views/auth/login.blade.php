@@ -18,7 +18,7 @@
       @error('password')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <button class="form-btn c-btn c-btn--red" type="submit">ログインする</button>
+      <button class="form-btn c-btn c-btn--black c-btn--auth" type="submit">ログインする</button>
     </form>
     <a class="login-link u-opacity-08" href="{{ route('register') }}">会員登録はこちら</a>
   </div>

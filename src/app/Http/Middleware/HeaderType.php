@@ -24,9 +24,7 @@ class HeaderType
     public function determineHeaderType(Request $request): string
     {
         /*
-        * ロゴのみの/login, /registerはfortifyでルートが
-        * 定義されているのでblade内（login.blade.php,
-        * register.blade.php）で直接値を渡す
+        * ロゴのみの/login, /registerの場合はnullが渡される
         */
         if (auth()->check()) {
             // 認証済の場合、ログアウトボタンを表示
