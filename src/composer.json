@@ -12,7 +12,6 @@
         "laravel/framework": "8.83.8",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "stripe/stripe-php": "^16.2",
         "symfony/css-selector": "^5.4",
         "symfony/dom-crawler": "^5.4"
     },

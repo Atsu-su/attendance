@@ -1,11 +1,10 @@
-<div id="header">
+  <div id="header">
   <img class="logo" src="{{ asset('img/logo.svg') }}" alt="carmeriのロゴ">
   @if (request()->headerType == 'logOut' || request()->headerType == 'logIn')
-    <form class="search" action="{{ route('index.search') }}" method="post">
-      @csrf
-      <input class="search-input" type="text" name="keyword" value="{{ $keyword ?? '' }}" placeholder="なにをお探しですか？">
-    </form>
     <nav class="nav">
+      <a class="nav-link" href="">勤怠</a>
+      <a class="nav-link" href="">勤怠一覧</a>
+      <a class="nav-link" href="">申請</a>
       @if (request()->headerType == 'logOut')
         <form action="{{ route('logout') }}" method="post">
           @csrf
@@ -14,12 +13,13 @@
       @else
         <a class="nav-link" href="{{ route('login') }}">ログイン</a>
       @endif
-      <a class="nav-link" href="{{ route('mypage') }}">マイページ</a>
-      <a class="nav-btn c-btn c-btn--header" href="{{ route('sell.create') }}">出品</a>
     </nav>
-    <nav class="nav-small">
-      <div id="svg" class="nav-small-svg"></div>
-      <div id="menu" class="nav-small-menu js-hidden">
+    <nav class="nav-hamburger">
+      <div id="svg" class="nav-hamburger-svg"></div>
+      <div id="menu" class="nav-hamburger-menu js-hidden">
+        <a class="nav-hamburger-menu-link" href="">勤怠一覧</a>
+        <a class="nav-hamburger-menu-link" href="">スタッフ一覧</a>
+        <a class="nav-hamburger-menu-link" href="">申請一覧</a>
         @if (request()->headerType == 'logOut')
           <form action="{{ route('logout') }}" method="post">
             @csrf
@@ -28,8 +28,6 @@
         @else
           <a class="nav-link" href="{{ route('login') }}">ログイン</a>
         @endif
-        <a class="nav-small-menu-link" href="{{ route('mypage') }}">マイページ</a>
-        <a class="nav-small-menu-btn c-btn c-btn--header-small" href="{{ route('sell.create')}}">出品</a>
       </div>
     </nav>
   @endif
@@ -48,10 +46,11 @@
         menu.classList.add('js-hidden');
       }
     });
-  }
-</script>
 
-{{-- エンターキーで検索開始 --}}
-<script>
-  // エンターを押すとsubmitされる機能を実装
+    window.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !svg.contains(e.target)) {
+        menu.classList.add('js-hidden');
+      }
+    });
+  }
 </script>
