@@ -195,8 +195,10 @@ iframe {
   --color-font-white: #fff;
   --color-font-blue: #0073CC;
   --color-font-gray: #696969;
+  --color-font-light-gray: #737373;
   --color-border-black: #000;
   --color-border-gray: #5F5F5F;
+  --color-border-light-gray: #E1E1E1
 }
 
 /* font */
@@ -213,6 +215,15 @@ html {
 a:hover {
   opacity: 0.8;
 }
+
+/* 各ページの共通設定 */
+.cmn-page {
+  min-height: calc(100vh - 80px);
+  line-height: 1;
+  background-color: var(--color-bg-base);
+  overflow: hidden;
+}
+
 
 /* =========================== */
 /*
@@ -238,12 +249,6 @@ a:hover {
 /* レイアウト
 /*
 /* =========================== */
-
-/* container */
-.l-container-70 {
-  margin: 0 auto;
-  width: calc(100% - 70px);
-}
 
 /* =========================== */
 /*
@@ -272,6 +277,7 @@ a:hover {
 .c-btn--white {
   color: var(--color-font-base);
   background-color: var(--color-bg-white);
+  border: 1px solid var(--color-border-gray)
 }
 
 .c-btn--auth {
@@ -466,6 +472,70 @@ a:hover {
   background-color: var(--color-bg-label);
 }
 
+/* ---------------------- */
+/* タイトル
+/* ---------------------- */
+.c-title {
+  margin-top: 91px;
+  padding-left: 21px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.5;
+  border-left: 8px solid var(--color-border-black);
+}
+
+/* ---------------------- */
+/* 勤怠一覧
+/* ---------------------- */
+.c-table {
+  margin: 46px 0 114px;
+  color: var(--color-font-light-gray);
+  font-weight: 700;
+  background-color: var(--color-bg-white);
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+  border-radius: 10px;
+}
+
+.c-table .header th {
+  padding-top: 15px;
+  padding-bottom: 12px;
+  font-weight: 700;
+}
+
+.c-table .header th:first-child,
+.c-table .data td:first-child {
+  padding-left: 55px;
+  width: 238px;
+}
+
+.c-table .header th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.c-table .header th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.c-table .data td {
+  padding-top: 15px;
+  padding-bottom: 12px;
+  border-top: 3px solid var(--color-border-light-gray);
+}
+
+.c-table .data:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+.c-table .data:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+.c-table .data td:last-child {
+  color: var(--color-font-base);
+}
+
 /* =========================== */
 /*
 /* js用クラス
@@ -506,6 +576,11 @@ body {
 /* bladeレイアウト
 /*
 /* =========================== */
+
+.l-container-60 {
+  margin: 0 auto;
+  width: 60%;
+}
 
 /* =========================== */
 /*
@@ -641,14 +716,10 @@ body {
 
 /* ----------------------- */
 /* attendance_register.blade.php
-/* ユーザ登録ページ（#attendance-register）
+/* 勤怠登録ページ（#attendance-register）
 /* ----------------------- */
 #attendance-register {
-  height: calc(100vh - 80px);
   text-align: center;
-  line-height: 1;
-  background-color: var(--color-bg-base);
-  overflow: hidden;
 }
 
 #attendance-register .label {
@@ -666,12 +737,96 @@ body {
   font-weight: 700;
 }
 
-#attendance-register .on-duty-button {
-  margin: 40px auto 0px;
+#attendance-register .buttons {
+  margin: 50px auto 0px;
+  display: flex;
+  justify-content: center;
 }
 
-#attendance-register .buttons {
-  display: none;
+#attendance-register .buttons-leave {
+  display: flex;
   gap: 40px;
   justify-content: center;
+}
+
+#attendance-register .message {
+  margin-top: 50px;
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* ----------------------- */
+/* attendance_list.blade.php
+/* 勤怠一覧（#attendance-list）
+/* ----------------------- */
+#attendance-list {
+  background-color: var(--color-bg-base);
+  overflow: hidden;
+}
+
+#attendance-list .month {
+  margin-top: 47px;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-white);
+  border-radius: 10px;
+}
+
+#attendance-list .month-prev,
+#attendance-list .month-next {
+  position: relative;
+  color: var(--color-font-light-gray);
+}
+
+#attendance-list .month-prev {
+  margin-left: 52px;
+}
+
+#attendance-list .month-prev::before {
+  content: '';
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  position: absolute;
+  left: -27px;
+  top: 2px;
+  background-image: url(../img/icon_prev_arrow.jpg);
+  background-size: cover;
+}
+
+#attendance-list .month-current {
+  position: relative;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+#attendance-list .month-current::before {
+  content: '';
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  position: absolute;
+  top: -3px;
+  left: -35px;
+  background-image: url(../img/icon_calendar.jpg);
+  background-size: cover;
+}
+
+#attendance-list .month-next {
+  margin-right  : 52px;
+}
+
+#attendance-list .month-next::before {
+  content: '';
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  position: absolute;
+  right: -27px;
+  top: 2px;
+  background-image: url(../img/icon_next_arrow.jpg);
+  background-size: cover;
 }

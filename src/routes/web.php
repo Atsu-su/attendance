@@ -27,6 +27,10 @@ Route::middleware('header')->group(function () {
         return view('attendance_register');
     });
     
+    Route::get('/list', function() {
+        return view('attendance_list');
+    });
+
     Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
