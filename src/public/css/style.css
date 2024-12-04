@@ -269,6 +269,10 @@ a:hover {
   opacity: 0.8;
 }
 
+.c-btn a {
+  display: block;
+}
+
 .c-btn--black {
   color: var(--color-font-white);
   background-color: var(--color-bg-black);
@@ -319,8 +323,12 @@ a:hover {
   border: 1px solid var(--color-border-gray);
 }
 
-.c-btn a {
-  display: block;
+.c-btn--attendance-correction {
+  margin: 0 0 0 auto;
+  width: 130px;
+  height: 50px;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 /* ---------------------- */
@@ -476,7 +484,7 @@ a:hover {
 /* タイトル
 /* ---------------------- */
 .c-title {
-  margin-top: 91px;
+  margin-top: 50px;
   padding-left: 21px;
   font-size: 30px;
   font-weight: 700;
@@ -485,10 +493,10 @@ a:hover {
 }
 
 /* ---------------------- */
-/* 勤怠一覧
+/* 一覧テーブル
 /* ---------------------- */
 .c-table {
-  margin: 46px 0 114px;
+  max-width: 900px;
   color: var(--color-font-light-gray);
   font-weight: 700;
   background-color: var(--color-bg-white);
@@ -504,36 +512,121 @@ a:hover {
   font-weight: 700;
 }
 
-.c-table .header th:first-child,
-.c-table .data td:first-child {
-  padding-left: 55px;
-  width: 238px;
-}
-
-.c-table .header th:first-child {
-  border-top-left-radius: 10px;
-}
-
-.c-table .header th:last-child {
-  border-top-right-radius: 10px;
-}
-
 .c-table .data td {
   padding-top: 15px;
   padding-bottom: 12px;
   border-top: 3px solid var(--color-border-light-gray);
 }
 
-.c-table .data:last-child td:first-child {
-  border-bottom-left-radius: 10px;
-}
-
-.c-table .data:last-child td:last-child {
-  border-bottom-right-radius: 10px;
-}
-
 .c-table .data td:last-child {
   color: var(--color-font-base);
+}
+
+/* 個別設定 */
+/* attendance-list関係 */
+.c-table--attendance-list .header th:first-child,
+.c-table--attendance-list .data td:first-child {
+  padding-left: 55px;
+  width: 238px;
+}
+
+/* application-list関係 */
+.c-table--application-list .header th:first-child,
+.c-table--application-list .data td:first-child {
+  padding-left: 55px;
+  width: 238px;
+}
+
+/* staff-listのレスポンシブ対応すること */
+
+/* staff-list関係 */
+.c-table--staff-list .header th:first-child,
+.c-table--staff-list .data td:first-child {
+  padding-left: 50px;
+  width: 238px;
+}
+
+.c-table--staff-list .header th:last-child,
+.c-table--staff-list .data td:last-child {
+  width: 150px;
+}
+
+@media screen and (max-width: 1000px) {
+  .c-table--attendance-list .header th:first-child,
+  .c-table--attendance-list .data td:first-child {
+    padding-left: 30px;
+    width: 200px;
+  }
+
+  .c-table--application-list .header th:first-child,
+  .c-table--application-list .data td:first-child {
+    padding-left: 30px;
+    width: 200px;
+  }
+}
+
+/* ---------------------- */
+/* 詳細テーブル
+/* ---------------------- */
+.c-table-detail {
+  color: var(--color-font-light-gray);
+  font-weight: 700;
+  background-color: var(--color-bg-white);
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+  border-radius: 10px;
+}
+
+.c-table-detail th {
+  padding: 28px 0 28px 64px;
+  width: 300px;
+  font-weight: 700;
+}
+
+.c-table-detail td {
+  color: var(--color-font-base);
+}
+
+.c-table-detail tr:not(:last-child) th,
+.c-table-detail tr:not(:last-child) td {
+  border-bottom: 2px solid var(--color-border-light-gray);
+}
+
+.c-table-detail .name {
+  padding-left: 24px;
+}
+
+.c-table-detail .input-date {
+  padding-left: 20px;
+  width: 206px;
+  height: 29px;
+  border: 1px solid var(--color-border-light-gray);
+  border-radius: 4px;
+}
+
+.c-table-detail .input-time {
+  padding-left: 28px;
+  padding-bottom: 2px;
+  width: 103px;
+  height: 29px;
+  font-weight: 700;
+  border: 1px solid var(--color-border-light-gray);
+  border-radius: 4px;
+}
+
+.c-table-detail .wave {
+  margin: 0 51px;
+  display: inline-block;
+}
+
+.c-table-detail .remarks {
+  margin: 18px 0;
+  padding-left: 8px;
+  padding-top: 3px;
+  width: 316px;
+  height: 72px;
+  border: 1px solid var(--color-border-light-gray);
 }
 
 /* =========================== */
@@ -546,7 +639,7 @@ a:hover {
 }
 
 .js-active-title {
-  color: var(--color-font-red);
+  font-weight: 700;
 }
 
 .js-processing {
@@ -580,6 +673,13 @@ body {
 .l-container-60 {
   margin: 0 auto;
   width: 60%;
+  max-width: 900px;
+}
+
+@media screen and (max-width: 1000px) {
+  .l-container-60 {
+    width: 80%;
+  }
 }
 
 /* =========================== */
@@ -587,10 +687,6 @@ body {
 /* bladeコンポーネント
 /*
 /* =========================== */
-
-/* header_logged_in.blade.php */
-/* header_logged_out.blade.php */
-/* header_only_logo.blade.php */
 #header {
   padding: 0 40px;
   width: 100%;
@@ -758,10 +854,15 @@ body {
 /* ----------------------- */
 /* attendance_list.blade.php
 /* 勤怠一覧（#attendance-list）
+/* c-tableを使用
 /* ----------------------- */
 #attendance-list {
   background-color: var(--color-bg-base);
   overflow: hidden;
+}
+
+#attendance-list .table {
+  margin: 46px 0 114px;
 }
 
 #attendance-list .month {
@@ -830,3 +931,44 @@ body {
   background-image: url(../img/icon_next_arrow.jpg);
   background-size: cover;
 }
+
+/* ----------------------- */
+/* application_list.blade.php
+/* 申請一覧（#application-list）
+/* c-tableを使用
+/* ----------------------- */
+#application-list .titles {
+  margin-top: 65px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--color-border-black);
+}
+
+#application-list .title {
+  display: inline-block;
+}
+
+#application-list .title:first-child {
+  margin-left: 57px;
+}
+
+#application-list .title:nth-child(2) {
+  margin-left: 100px;
+}
+
+#application-list .tabs {
+  margin: 45px 0 170px;
+}
+
+/* ----------------------- */
+/* attendance_detail.blade.php
+/* 申請一覧（#attendance-detail）
+/* c-table-detailを使用
+/* ----------------------- */
+#attendance-detail table {
+  margin: 30px 0 20px;
+}
+
+#attendance-detail .button {
+  margin-bottom: 43px;
+}
+

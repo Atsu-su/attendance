@@ -15,20 +15,45 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/login', function(){
-    return view('auth.login');
+    return view('auth.user.login');
 })->name('login');
 
 Route::get('/register', function(){
-    return view('auth.register');
+    return view('auth.user.register');
 })->name('register');
 
+Route::get('/admin/login', function(){
+    return view('auth.admin.login');
+});
+
+// ヘッダーのミドルウェア
 Route::middleware('header')->group(function () {
     Route::get('/attendance', function(){
-        return view('attendance_register');
+        return view('user.attendance_register');
     });
     
     Route::get('/list', function() {
-        return view('attendance_list');
+        return view('user.attendance_list');
+    });
+
+    Route::get('/application', function() {
+        return view('user.application_list');
+    });
+
+    Route::get('/detail', function() {
+        return view('user.attendance_detail');
+    });
+    
+    Route::get('/admin/list', function(){
+        return view('admin.attendance_list');
+    });
+    
+    Route::get('/admin/detail', function(){
+        return view('admin.attendance_detail');
+    });
+
+    Route::get('/admin/staff', function(){
+        return view('admin.staff_list');
     });
 
     Route::middleware(['auth', 'verified'])->group(function () {
