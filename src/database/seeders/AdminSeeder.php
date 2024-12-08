@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Admin;
+use App\Models\Category;
+use App\Models\CategoryItem;
 use Illuminate\Database\Seeder;
 
-class UserSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,6 +16,6 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        if(! User::exists()) User::factory(5)->create();
+        if (! Admin::exists()) Admin::factory(3)->create();
     }
 }

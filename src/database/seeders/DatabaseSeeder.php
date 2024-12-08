@@ -15,15 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         // 実行順序を制御できます
         $this->call([
-          CategorySeeder::class,
-          ConditionSeeder::class,
-          UserSeeder::class,
-          ItemSeeder::class,
-          CategoryItemSeeder::class,
-          PaymentMethodSeeder::class,
-          PurchaseSeeder::class,
-          CommentSeeder::class,
-          LikeSeeder::class,
+            UserSeeder::class,
+            AdminSeeder::class,
+            ApplicationSeeder::class,
+            AttendanceSeeder::class,
       ]);
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCommentsTable extends Migration
+class CreateApplicationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,18 @@ class CreateCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('applications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('item_id');
             $table->unsignedBigInteger('user_id');
-            $table->string('comment', 255);
+            $table->boolean('is_approved')->default(false)->comment('0: pending approval, 1: approved');
+            $table->date('application_date');
+            $table->date('date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('break_time');
+            $table->string('reason');
             $table->timestamps();
 
-            $table->foreign('item_id')->references('id')->on('items');
             $table->foreign('user_id')->references('id')->on('users');
         });
     }
@@ -32,6 +36,6 @@ class CreateCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('applications');
     }
 }
