@@ -2,14 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\Application;
-use App\Models\Category;
+use App\Models\StampCorrectionRequest;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 
-class ApplicationSeeder extends Seeder
+class StampCorrectionRequestSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -27,10 +26,10 @@ class ApplicationSeeder extends Seeder
             $date = Carbon::now();
 
             for ($i = 0; $i < 5; $i++) {
-                Application::create([
+                StampCorrectionRequest::create([
                     'user_id' => $user->id,
                     'is_approved' => 0,
-                    'application_date' => $date->toDateString(),
+                    'request_date' => $date->toDateString(),
                     'date' => $date->addDays(-2)->toDateString(),
                     'start_time' => Arr::random($startTime),
                     'end_time' => Arr::random($endTime),

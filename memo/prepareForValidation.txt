@@ -1,0 +1,17 @@
+// app/Http/Requests/TimeEntryRequest.php
+public function prepareForValidation()
+{
+    $this->merge([
+        'start_time' => $this->formatTime($this->start_time),
+        'end_time' => $this->formatTime($this->end_time)
+    ]);
+}
+
+private function formatTime($time)
+{
+    // 時間が1桁で入力された場合、2桁に変換する
+    if (preg_match('/^([0-9]):([0-5][0-9])$/', $time, $matches)) {
+        return sprintf('%02d:%02d', $matches[1], $matches[2]);
+    }
+    return $time;
+}

@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', '【管理者】スタッフ一覧')
 @section('header')
-  @include('components.admin.header')
+  @include('components.header')
 @endsection
 @section('content')
   <div id="attendance-list" class="cmn-page">

@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', 'メール確認')
 @section('header')
-  @include('components.user.header')
+  @include('components.header')
 @endsection
 @section('content')
   <div id="verify-email">

@@ -1,11 +1,11 @@
 @extends('layouts.base')
-@section('title', '【管理者】ログイン')
+@section('title', 'ログイン')
 @section('header')
-  @include('components.admin.header')
+  @include('components.header')
 @endsection
 @section('content')
   <div class="c-default-form" id="login">
-    <h1 class="title">管理者ログイン</h1>
+    <h1 class="title">ログイン</h1>
     <form class="form" action="{{ route('login') }}" method="post">
       @csrf
       <label class="form-title">メールアドレス</label>
@@ -18,7 +18,8 @@
       @error('password')
         <p class="c-error-message">{{ $message }}</p>
       @enderror
-      <button class="form-btn c-btn c-btn--black c-btn--auth" type="submit">管理者ログインする</button>
+      <button class="form-btn c-btn c-btn--black c-btn--auth" type="submit">ログインする</button>
     </form>
+    <a class="login-link" href="{{ route('register') }}">会員登録はこちら</a>
   </div>
 @endsection

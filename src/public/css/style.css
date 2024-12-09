@@ -308,7 +308,6 @@ a:hover {
 
 .c-btn--verify-logout {
   margin: 0 auto;
-  padding-top: 5px;
   width: 300px;
   height: 60px;
   color: var(--color-font-base);
@@ -384,7 +383,7 @@ a:hover {
 .c-error-message {
   margin-top: 8px;
   color: var(--color-font-red);
-  font-size: 0.75rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
@@ -530,9 +529,9 @@ a:hover {
   width: 238px;
 }
 
-/* application-list関係 */
-.c-table--application-list .header th:first-child,
-.c-table--application-list .data td:first-child {
+/* stamp-correction-request関係 */
+.c-table--stamp-correction-request .header th:first-child,
+.c-table--stamp-correction-request .data td:first-child {
   padding-left: 55px;
   width: 238px;
 }
@@ -558,8 +557,8 @@ a:hover {
     width: 200px;
   }
 
-  .c-table--application-list .header th:first-child,
-  .c-table--application-list .data td:first-child {
+  .c-table--stamp-correction-request .header th:first-child,
+  .c-table--stamp-correction-request .data td:first-child {
     padding-left: 30px;
     width: 200px;
   }
@@ -625,7 +624,7 @@ a:hover {
   padding-left: 8px;
   padding-top: 3px;
   width: 316px;
-  height: 72px;
+  height: 90px;
   border: 1px solid var(--color-border-light-gray);
 }
 
@@ -933,29 +932,29 @@ body {
 }
 
 /* ----------------------- */
-/* application_list.blade.php
-/* 申請一覧（#application-list）
+/* stamp_correction_request.blade.php
+/* 申請一覧（#stamp-correction-request）
 /* c-tableを使用
 /* ----------------------- */
-#application-list .titles {
+#stamp-correction-request .titles {
   margin-top: 65px;
   padding-bottom: 17px;
   border-bottom: 1px solid var(--color-border-black);
 }
 
-#application-list .title {
+#stamp-correction-request .title {
   display: inline-block;
 }
 
-#application-list .title:first-child {
+#stamp-correction-request .title:first-child {
   margin-left: 57px;
 }
 
-#application-list .title:nth-child(2) {
+#stamp-correction-request .title:nth-child(2) {
   margin-left: 100px;
 }
 
-#application-list .tabs {
+#stamp-correction-request .tabs {
   margin: 45px 0 170px;
 }
 
@@ -964,7 +963,7 @@ body {
 /* 申請一覧（#attendance-detail）
 /* c-table-detailを使用
 /* ----------------------- */
-#attendance-detail table {
+#attendance-detail .table {
   margin: 30px 0 20px;
 }
 

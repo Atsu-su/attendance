@@ -1,10 +1,10 @@
 @extends('layouts.base')
 @section('title', '申請一覧')
 @section('header')
-  @include('components.user.header')
+  @include('components.header')
 @endsection
 @section('content')
-  <div id="application-list" class="cmn-page">
+  <div id="stamp-correction-request" class="cmn-page">
     <div class="l-container-60">
       <h1 class="c-title">申請一覧</h1>
       <div class="titles">
@@ -13,7 +13,7 @@
       </div>
       <div class="tabs">
         <div id="first-tab" class="tab first-tab">
-          <table class="c-table c-table--application-list table">
+          <table class="c-table c-table--stamp_correction_request table">
             <tr class="header">
               <th>状態</th>
               <th>名前</th>
@@ -23,7 +23,7 @@
               <th>詳細</th>
             </tr>
             <tr class="data">
-              <td>06/01(金)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -31,7 +31,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/04(月)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -39,7 +39,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -47,7 +47,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -55,7 +55,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -63,7 +63,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -71,7 +71,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -79,7 +79,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -87,7 +87,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -95,7 +95,7 @@
               <td>詳細</td>
             </tr>
             <tr class="data">
-              <td>06/05(火)</td>
+              <td>承認待ち</td>
               <td>08:00</td>
               <td>20:00</td>
               <td>01:00</td>
@@ -105,7 +105,7 @@
           </table>
         </div>
         <div id="second-tab" class="tab second-tab js-hidden">
-          <table class="c-table c-table--application-list table">
+          <table class="c-table c-table--stamp_correction_request table">
             <tr class="header">
               <th>状態</th>
               <th>名前</th>
