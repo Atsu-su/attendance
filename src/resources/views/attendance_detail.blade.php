@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', '勤怠詳細')
 @section('header')
-  @include('components.user.header')
+  @include('components.header')
 @endsection
 @section('content')
   <div id="attendance-detail" class="cmn-page">

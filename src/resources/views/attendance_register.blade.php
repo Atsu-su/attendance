@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', '勤怠管理システム')
 @section('header')
-  @include('components.user.header')
+  @include('components.header')
 @endsection
 @section('content')
   <div id="attendance-register" class="cmn-page">

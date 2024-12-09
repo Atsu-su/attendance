@@ -1,7 +1,12 @@
-  <div id="header">
+{{-- ユーザか管理者かの判定はミドルウェア（HeaderType.php）内で行う --}}
+<div id="header">
   <img class="logo" src="{{ asset('img/logo.svg') }}" alt="carmeriのロゴ">
   @if (request()->headerType == 'logOut' || request()->headerType == 'logIn')
     <nav class="nav">
+      {{-- 管理者でログインした場合のヘッダー --}}
+      {{-- <a class="nav-link" href="">勤怠一覧</a>
+      <a class="nav-link" href="">スタッフ一覧</a>
+      <a class="nav-link" href="">申請一覧</a> --}}
       <a class="nav-link" href="">勤怠</a>
       <a class="nav-link" href="">勤怠一覧</a>
       <a class="nav-link" href="">申請</a>
@@ -17,9 +22,13 @@
     <nav class="nav-hamburger">
       <div id="svg" class="nav-hamburger-svg"></div>
       <div id="menu" class="nav-hamburger-menu js-hidden">
-        <a class="nav-hamburger-menu-link" href="">勤怠一覧</a>
-        <a class="nav-hamburger-menu-link" href="">スタッフ一覧</a>
-        <a class="nav-hamburger-menu-link" href="">申請一覧</a>
+        {{-- 管理者でログインした場合のヘッダー --}}
+        {{-- <a class="nav-link" href="">勤怠一覧</a>
+        <a class="nav-link" href="">スタッフ一覧</a>
+        <a class="nav-link" href="">申請一覧</a> --}}
+        <a class="nav-link" href="">勤怠</a>
+        <a class="nav-link" href="">勤怠一覧</a>
+        <a class="nav-link" href="">申請</a>
         @if (request()->headerType == 'logOut')
           <form action="{{ route('logout') }}" method="post">
             @csrf

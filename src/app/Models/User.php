@@ -50,8 +50,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Attendance::class);
     }
 
-    public function applications()
+    public function stampCorrectionRequests()
     {
-        return $this->hasMany(Application::class, 'buyer_id');
+        return $this->hasMany(StampCorrectionRequest::class, 'buyer_id');
     }
 }
