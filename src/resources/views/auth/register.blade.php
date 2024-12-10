@@ -1,7 +1,7 @@
 @extends('layouts.base')
 @section('title', 'ユーザ登録')
 @section('header')
-  @include('components.user.header')
+  @include('components.header')
 @endsection
 @section('content')
   <div class="c-default-form" id="register">
