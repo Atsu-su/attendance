@@ -26,9 +26,10 @@ class StampCorrectionRequestSeeder extends Seeder
             $date = Carbon::now();
 
             for ($i = 0; $i < 5; $i++) {
+                $boolean = $i % 2 ? 0 : 1;
                 StampCorrectionRequest::create([
                     'user_id' => $user->id,
-                    'is_approved' => 0,
+                    'is_approved' => $boolean,
                     'request_date' => $date->toDateString(),
                     'date' => $date->addDays(-2)->toDateString(),
                     'start_time' => Arr::random($startTime),

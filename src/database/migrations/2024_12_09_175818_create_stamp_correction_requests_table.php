@@ -21,7 +21,7 @@ class CreateStampCorrectionRequestsTable extends Migration
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->string('break_time');
+            $table->time('break_time');
             $table->string('reason');
             $table->timestamps();
 

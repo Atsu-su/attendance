@@ -507,13 +507,13 @@ a:hover {
 
 .c-table .header th {
   padding-top: 15px;
-  padding-bottom: 12px;
+  padding-bottom: 15px;
   font-weight: 700;
 }
 
 .c-table .data td {
   padding-top: 15px;
-  padding-bottom: 12px;
+  padding-bottom: 15px;
   border-top: 3px solid var(--color-border-light-gray);
 }
 
@@ -529,14 +529,30 @@ a:hover {
   width: 238px;
 }
 
+@media screen and (max-width: 1000px) {
+  .c-table--attendance-list .header th:first-child,
+  .c-table--attendance-list .data td:first-child {
+    padding-left: 30px;
+    width: 200px;
+  }
+}
+
 /* stamp-correction-request関係 */
 .c-table--stamp-correction-request .header th:first-child,
 .c-table--stamp-correction-request .data td:first-child {
-  padding-left: 55px;
-  width: 238px;
+  padding-left: 20px;
+  width: 120px;
 }
 
-/* staff-listのレスポンシブ対応すること */
+.c-table--stamp-correction-request .header th:nth-child(4),
+.c-table--stamp-correction-request .data td:nth-child(4) {
+  width: 180px;
+}
+
+.c-table--stamp-correction-request .header th:last-child,
+.c-table--stamp-correction-request .data td:last-child {
+  padding-right: 10px;
+}
 
 /* staff-list関係 */
 .c-table--staff-list .header th:first-child,
@@ -548,20 +564,6 @@ a:hover {
 .c-table--staff-list .header th:last-child,
 .c-table--staff-list .data td:last-child {
   width: 150px;
-}
-
-@media screen and (max-width: 1000px) {
-  .c-table--attendance-list .header th:first-child,
-  .c-table--attendance-list .data td:first-child {
-    padding-left: 30px;
-    width: 200px;
-  }
-
-  .c-table--stamp-correction-request .header th:first-child,
-  .c-table--stamp-correction-request .data td:first-child {
-    padding-left: 30px;
-    width: 200px;
-  }
 }
 
 /* ---------------------- */
@@ -936,6 +938,24 @@ body {
 /* 申請一覧（#stamp-correction-request）
 /* c-tableを使用
 /* ----------------------- */
+#stamp-correction-request .container {
+  margin: 0 auto;
+  width: 60%;
+  max-width: 900px;
+}
+
+@media screen and (max-width: 1300px) {
+  #stamp-correction-request .container {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  #stamp-correction-request .container {
+    width: 95%;
+  }
+}
+
 #stamp-correction-request .titles {
   margin-top: 65px;
   padding-bottom: 17px;

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\StampCorrectionRequestController;
 use App\Http\Requests\StampCorrectionRequest;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,10 +42,6 @@ Route::middleware('header')->group(function () {
         return view('attendance_list');
     });
 
-    Route::get('/stamp', function() {
-        return view('stamp_correction_request');
-    });
-
     Route::get('/detail', function() {
         return view('attendance_detail');
     });
@@ -66,5 +63,7 @@ Route::middleware('header')->group(function () {
     });
 
     Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
+           ->name('stamp_correction_request_list');
     });
 });

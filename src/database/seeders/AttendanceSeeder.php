@@ -27,7 +27,7 @@ class AttendanceSeeder extends Seeder
             $user = User::find($j);
             $date = Carbon::now();
 
-            for ($i = 0; $i < 40; $i++) {
+            for ($i = 0; $i < 60; $i++) {
                 Attendance::create([
                     'user_id' => $user->id,
                     'status' => 'off_duty',
