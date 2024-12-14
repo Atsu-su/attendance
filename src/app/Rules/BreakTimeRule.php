@@ -29,10 +29,10 @@ class BreakTimeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        // 休憩開始時間＜休憩終了時間ならtrue
+        // 休憩開始時間＜＝休憩終了時間ならtrue
         $breakStart = Carbon::createFromFormat('H:i', $this->startTime);
         $breakEnd = Carbon::createFromFormat('H:i', $value);
-        return $breakStart->lessThan($breakEnd);
+        return $breakStart->lessThanOrEqualTo($breakEnd);
     }
 
     /**

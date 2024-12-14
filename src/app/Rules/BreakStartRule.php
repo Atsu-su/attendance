@@ -29,7 +29,7 @@ class BreakStartRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        // 勤務開始時間＜休憩開始時間ならtrue
+        // 勤務開始時間＜＝休憩開始時間ならtrue
         $start = Carbon::createFromFormat('H:i', $this->startTime);
         $breakStart = Carbon::createFromFormat('H:i', $value);
         return $start->lessThanOrEqualTo($breakStart);

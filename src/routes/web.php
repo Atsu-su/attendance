@@ -1,8 +1,12 @@
 <?php
 
-use App\Http\Requests\StampCorrectionRequest;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StampCorrectionRequestController;
+use App\Models\Attendance;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,56 +19,105 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/login', function(){
-    return view('auth.login');
-})->name('login');
+// 修正
+// 管理者ログイン時はユーザ用のサイトにアクセスできない（逆も同じ）ようにする
 
-Route::get('/register', function(){
-    return view('auth.register');
-})->name('register');
+// 日付の情報はheaderと
+Route::middleware('date')->group(function () {
+    // -----------------------------------------------------
+    // 管理者用のルーティング
+    // -----------------------------------------------------
+    // 管理者ログイン画面
+    Route::get('admin/login', function() {
+        return view('auth.admin_login');
+        })->middleware('web', 'guest:admin');
 
-Route::get('/admin/login', function(){
-    return view('auth.login');
-});
+    Route::post('admin/login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware(['guest:admin'])
+        ->name('admin-login');
 
-Route::get('/verify', function(){
-    return view('auth.verify_email');
-});
+    Route::middleware(['auth:admin'])->group(function () {
+        Route::prefix('admin')->group(function() {
+            Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+                ->name('admin-logout');
+            Route::get('attendance/list', [AttendanceController::class, 'index'])
+                ->name('admin-attendance.index');
+            Route::get('attendance/list/{year}/{month}/{day}', [AttendanceController::class, 'showDailyList'])
+                ->whereNumber(['year', 'month', 'day'])       // 数字のみ許可
+                ->name('admin-attendance.show-daily-list');
+            Route::get('attendance/staff/{year}/{month}/{id}', [AttendanceController::class, 'showList'])
+                ->whereNumber(['year', 'month', 'id'])        // 数字のみ許可
+                ->name('admin-attendance.show-list');
+            Route::get('attendance/{id}', [AttendanceController::class, 'show'])
+                ->whereNumber('id')         // {id}は数字のみ許可
+                ->name('admin-attendance.show');
+            Route::post('attendance/{id}', [AttendanceController::class, 'store'])
+                ->whereNumber('id')         // {id}は数字のみ許可
+                ->name('admin-attendance.store');
+            Route::get('attendance/{year}/{month}/{day}/{id}', [AttendanceController::class, 'create'])
+                ->whereNumber(['year', 'month', 'day', 'id']) // 数字のみ許可
+                ->name('admin-attendance.create');
+            Route::get('staff/list', [StaffController::class, 'showStaffList'])
+                ->name('admin-staff.show-list');
+            Route::post('csv/{year}/{month}/{id}', [AttendanceController::class, 'exportCsv'])
+                ->whereNumber(['year', 'month', 'id'])        // 数字のみ許可
+                ->name('admin-attendance.export-csv');
 
-// ヘッダーのミドルウェア
-Route::middleware('header')->group(function () {
-    Route::get('/attendance', function(){
-        return view('attendance_register');
+            Route::get('stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
+                ->name('admin-stamp-correction-request.index');
+
+            // -------------------------------------------------------------------
+            // 結局同じメソッドを呼び出すのでルートを分ける必要はないが、意味が異なるので分ける
+            // -------------------------------------------------------------------
+            // 承認済み申請の表示
+            Route::get('stamp_correction_request/{stamp_correction_request}', [StampCorrectionRequestController::class, 'show'])
+                ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
+                ->name('admin-stamp-correction-request.show');
+            // 未承認申請の表示
+            Route::get('stamp_correction_request/approve/{stamp_correction_request}', [StampCorrectionRequestController::class, 'show'])
+                ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
+                ->name('admin-stamp-correction-request-approve.show');
+
+            Route::post('stamp_correction_request/approve/{stamp_correction_request}', [AttendanceController::class, 'storeRequest'])
+                ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
+                ->name('admin-attendance.storeRequest');
+        });
     });
 
-    Route::get('/list', function() {
-        return view('attendance_list');
-    });
-
-    Route::get('/stamp', function() {
-        return view('stamp_correction_request');
-    });
-
-    Route::get('/detail', function() {
-        return view('attendance_detail');
-    });
-
-    Route::post('/detail', function(StampCorrectionRequest $request) {
-        return view('attendance_detail');
-    });
-
-    Route::get('/admin/list', function(){
-        return view('attendance_list');
-    });
-
-    Route::get('/admin/detail', function(){
-        return view('attendance_detail');
-    });
-
-    Route::get('/admin/staff', function(){
-        return view('staff_list');
-    });
+    // -----------------------------------------------------
+    // ユーザ用のルーティング
+    // -----------------------------------------------------
+    // indexの設定
+    Route::get('/', [AttendanceController::class, 'index'])
+        ->name('attendance.index');
 
     Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('attendance', [AttendanceController::class, 'register'])
+            ->name('attendance.register');
+        Route::post('attendance/startwork', [AttendanceController::class, 'startWorkApi'])
+            ->name('attendance.start-work');
+        Route::post('attendance/endwork', [AttendanceController::class, 'endWorkApi'])
+            ->name('attendance.end-work');
+        Route::post('attendance/startbreak', [AttendanceController::class, 'startBreakApi'])
+            ->name('attendance.start-break');
+        Route::post('attendance/endbreak', [AttendanceController::class, 'endBreakApi'])
+            ->name('attendance.end-break');
+        Route::get('attendance/list/{year}/{month}', [AttendanceController::class, 'showList'])
+            ->whereNumber(['year', 'month'])       // 数字のみ許可
+            ->name('attendance.show-list');
+        Route::get('attendance/{id}', [AttendanceController::class, 'show'])
+            ->whereNumber('id')         // {id}は数字のみ許可
+            ->name('attendance.show');
+        Route::post('attendance/{id}', [AttendanceController::class, 'store'])
+            ->whereNumber('id')         // {id}は数字のみ許可
+            ->name('attendance.store');
+        Route::get('attendance/{year}/{month}/{day}', [AttendanceController::class, 'create'])
+            ->name('attendance.create');
+
+        Route::get('stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
+            ->name('stamp-correction-request.index');
+        Route::get('stamp-correction-request/{stamp_correction_request}', [StampCorrectionRequestController::class, 'show'])
+            ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
+            ->name('stamp-correction-request.show');
     });
 });

@@ -9,10 +9,13 @@
     <form class="form" action="{{ route('register') }}" method="post">
       @csrf
       <label class="form-title">ユーザ名</label>
-      <input class="form-input" type="text" name="name" value="{{ old('name') }}">
-      @error('name')
-        <p class="c-error-message">{{ $message }}</p>
-      @enderror
+      <div class="form-input-name">
+        <input class="form-input" type="text" name="family_name" value="{{ old('family_name') }}" placeholder="姓">
+        <input class="form-input" type="text" name="given_name" value="{{ old('given_name') }}" placeholder="名">
+      </div>
+      @if (!empty($errors->has('family_name')) || !empty($errors->has('given_name')))
+        <p class="c-error-message">{{ !empty($errors->first('family_name')) ? $errors->first('family_name') : $errors->first('given_name') }}</p>
+      @endif
       <label class="form-title">メールアドレス</label>
       <input class="form-input" type="text" name="email" value="{{ old('email') }}">
       @error('email')

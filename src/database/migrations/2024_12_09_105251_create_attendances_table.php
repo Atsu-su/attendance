@@ -16,13 +16,14 @@ class CreateAttendancesTable extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('status')->comment('on_duty, off_duty, break');
             $table->date('date');
-            $table->time('start_time');
+            $table->string('status')->comment('on_duty, off_duty, break');
+            $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
-            $table->string('break_time')->nullable();
             $table->timestamps();
 
+            // ユーザIDと日付の組み合わせでユニークにする
+            $table->unique(['user_id', 'date']);
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

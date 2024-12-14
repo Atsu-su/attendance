@@ -24,7 +24,8 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
+            'family_name' => 'required|string',
+            'given_name' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
             'confirm_password' => 'required|same:password',
@@ -34,11 +35,15 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'お名前を入力してください',
+            'family_name.required' => '姓名を入力してください',
+            'family_name.string' => '姓名は文字列で入力してください',
+            'given_name.required' => '姓名を入力してください',
+            'given_name.string' => '姓名は文字列で入力してください',
             'email.required' => 'メールアドレスを入力してください',
             'email.email' => 'メールアドレスの形式で入力してください',
             'email.unique' => 'このメールアドレスは既に登録されています',
             'password.required' => 'パスワードを入力してください',
+            'password.string' => 'パスワードは文字列で入力してください',
             'password.min' => 'パスワードは8文字以上で入力してください',
             'confirm_password.required' => '確認用パスワードを入力してください',
             'confirm_password.same' => 'パスワードと一致しません'

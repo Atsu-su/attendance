@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Attendance;
 use App\Models\StampCorrectionRequest;
+use App\Models\RequestBreakTime;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -19,23 +21,39 @@ class StampCorrectionRequestSeeder extends Seeder
     {
         $startTime = ['08:30', '09:00', '09:30', '10:00', '10:30'];
         $endTime = ['17:30', '18:00', '18:30', '19:00', '19:30'];
-        $breakTime = ['00:30', '01:00', '01:30', '02:00', '02:30'];
+        $breakStartTime = ['11:30' ,'12:40', '13:50'];
+        $breakEndTime = ['12:30', '13:40', '14:50'];
+
+        // 申請数
+        $num = 5;
 
         for ($j = 1; $j <= User::count(); $j++) {
             $user = User::find($j);
+            $attendances = Attendance::where('user_id', $user->id)
+                ->limit($num)
+                ->get();
             $date = Carbon::now();
 
-            for ($i = 0; $i < 5; $i++) {
-                StampCorrectionRequest::create([
+            for ($i = 0; $i < $num; $i++) {
+                $boolean = $i % 2 ? 0 : 1;
+                $request = StampCorrectionRequest::create([
+                    'attendance_id' => $attendances[$i]->id,
                     'user_id' => $user->id,
-                    'is_approved' => 0,
+                    'is_approved' => $boolean,
                     'request_date' => $date->toDateString(),
-                    'date' => $date->addDays(-2)->toDateString(),
                     'start_time' => Arr::random($startTime),
                     'end_time' => Arr::random($endTime),
-                    'break_time' => Arr::random($breakTime),
-                    'reason' => 'Personal-'.$j.'-'.$i,
+                    'remarks' => 'Personal-'.$j.'-'.$i,
                 ]);
+
+                $hmax = ($i + 1) % 3 == 0 ? 3 : ($i + 1) % 3;
+                for ($h = 0; $h < $hmax; $h++) {
+                    RequestBreakTime::create([
+                        'stamp_correction_request_id' => $request->id,
+                        'start_time' => $breakStartTime[$h],
+                        'end_time' => $breakEndTime[$h],
+                    ]);
+                }
 
                 $date->addDay(5);
             }

@@ -1,0 +1,23 @@
+モーダルのmodal_errorは@componentで読み込むようにする
+
+<style>
+  .footer li {
+    list-style: square;
+  }
+</style>
+
+<div class="footer">
+  <p>{{$footerg_title}}</p>
+  <ul>{{$footer_content}}</ul>
+</div>
+
+@component('components.footer')
+  @slot('footer_title')
+    footer
+  @endslot
+
+  @slot('footer_content')
+    <li>aaa</li>
+    <li>bbb</li>
+  @endslot
+@endcomponent

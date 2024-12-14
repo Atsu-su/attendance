@@ -1,42 +1,57 @@
-{{-- ユーザか管理者かの判定はミドルウェア（HeaderType.php）内で行う --}}
 <div id="header">
   <img class="logo" src="{{ asset('img/logo.svg') }}" alt="carmeriのロゴ">
-  @if (request()->headerType == 'logOut' || request()->headerType == 'logIn')
+  @if (auth('admin')->check() ||  auth('web')->check())
     <nav class="nav">
-      {{-- 管理者でログインした場合のヘッダー --}}
-      {{-- <a class="nav-link" href="">勤怠一覧</a>
-      <a class="nav-link" href="">スタッフ一覧</a>
-      <a class="nav-link" href="">申請一覧</a> --}}
-      <a class="nav-link" href="">勤怠</a>
-      <a class="nav-link" href="">勤怠一覧</a>
-      <a class="nav-link" href="">申請</a>
-      @if (request()->headerType == 'logOut')
+
+      {{-- 管理者用 --}}
+      @if (auth('admin')->check())
+        <a class="nav-link" href="{{ route('admin-attendance.show-daily-list', ['year' =>  request()->year, 'month' =>  request()->month, 'day' =>  request()->day]) }}">勤怠一覧</a>
+        <a class="nav-link" href="{{ route('admin-staff.show-list') }}">スタッフ一覧</a>
+        <a class="nav-link" href="{{ route('admin-stamp-correction-request.index') }}">申請一覧</a>
+        <form action="{{ route('admin-logout') }}" method="post">
+          @csrf
+          <button class="nav-link" type="submit">ログアウト</button>
+        </form>
+      @endif
+
+      {{-- ユーザ用 --}}
+      @if (auth('web')->check())
+        <a class="nav-link" href="{{ route('attendance.register') }}">勤怠</a>
+        <a class="nav-link" href="{{ route('attendance.show-list', ['year' => request()->year, 'month' => request()->month]) }}">勤怠一覧</a>
+        <a class="nav-link" href="{{ route('stamp-correction-request.index') }}">申請</a>
         <form action="{{ route('logout') }}" method="post">
           @csrf
           <button class="nav-link" type="submit">ログアウト</button>
         </form>
-      @else
-        <a class="nav-link" href="{{ route('login') }}">ログイン</a>
       @endif
+
     </nav>
     <nav class="nav-hamburger">
       <div id="svg" class="nav-hamburger-svg"></div>
       <div id="menu" class="nav-hamburger-menu js-hidden">
-        {{-- 管理者でログインした場合のヘッダー --}}
-        {{-- <a class="nav-link" href="">勤怠一覧</a>
-        <a class="nav-link" href="">スタッフ一覧</a>
-        <a class="nav-link" href="">申請一覧</a> --}}
-        <a class="nav-link" href="">勤怠</a>
-        <a class="nav-link" href="">勤怠一覧</a>
-        <a class="nav-link" href="">申請</a>
-        @if (request()->headerType == 'logOut')
+
+        {{-- 管理者用 --}}
+        @if (auth('admin')->check())
+          <a class="nav-link" href="{{ route('admin-attendance.show-daily-list', ['year' =>  request()->year, 'month' =>  request()->month, 'day' =>  request()->day]) }}">勤怠一覧</a>
+          <a class="nav-link" href="{{ route('admin-staff.show-list') }}">スタッフ一覧</a>
+          <a class="nav-link" href="{{ route('admin-stamp-correction-request.index') }}">申請一覧</a>
+          <form action="{{ route('admin-logout') }}" method="post">
+            @csrf
+            <button class="nav-link" type="submit">ログアウト</button>
+          </form>
+        @endif
+
+        {{-- ユーザ用 --}}
+        @if (auth('web')->check())
+          <a class="nav-link" href="{{ route('attendance.register') }}">勤怠</a>
+          <a class="nav-link" href="{{ route('attendance.show-list', ['year' => request()->year, 'month' => request()->month]) }}">勤怠一覧</a>
+          <a class="nav-link" href="{{ route('stamp-correction-request.index') }}">申請</a>
           <form action="{{ route('logout') }}" method="post">
             @csrf
             <button class="nav-link" type="submit">ログアウト</button>
           </form>
-        @else
-          <a class="nav-link" href="{{ route('login') }}">ログイン</a>
         @endif
+
       </div>
     </nav>
   @endif

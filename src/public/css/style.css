@@ -128,9 +128,17 @@ select {
   font-size: 16px;
 }
 
+input::placeholder {
+  opacity: 0.6;
+}
+
 textarea {
   resize: vertical;
   display: block;
+}
+
+textarea::placeholder {
+  opacity: 0.6;
 }
 
 button {
@@ -330,6 +338,13 @@ a:hover {
   font-weight: 700;
 }
 
+.c-btn--attendance-list {
+  width: 130px;
+  height: 50px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
 /* ---------------------- */
 /* デフォルトのフォーム
 /* ---------------------- */
@@ -365,6 +380,11 @@ a:hover {
   border: 1px solid var(--color-border-gray)
 }
 
+.c-default-form .form-input-name {
+  display: flex;
+  gap: 20px;
+}
+
 .c-default-form .form-btn {
   margin-top: 67px;
   margin-bottom: 35px;
@@ -387,8 +407,16 @@ a:hover {
   line-height: 1;
 }
 
+.c-table-error-message {
+  margin-top: 8px;
+  color: var(--color-font-red);
+  font-size: 0.8rem;
+  font-weight: normal;
+  line-height: 1;
+}
+
 /* ---------------------- */
-/* モーダル
+/* DB処理完了メッセージ用モーダル
 /* ---------------------- */
 .c-modal {
   width: 100vw;
@@ -396,6 +424,11 @@ a:hover {
   position: fixed;
   z-index: 100;
   background-color: var(--color-bg-modal);
+}
+
+.c-modal--confirm {
+  top: 0;
+  left: 0;
 }
 
 .c-modal .message {
@@ -409,7 +442,7 @@ a:hover {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  background-color: var(--color-bg-btn-white);
+  background-color: var(--color-bg-white);
   border: 1px solid var(--color-border-gray);
   border-radius: 5px;
   animation: modalScale 0.5s ease forwards;
@@ -467,6 +500,87 @@ a:hover {
 }
 
 /* ---------------------- */
+/* 処理実行継続確認用モーダル
+/* ---------------------- */
+.c-modal-confirm {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: var(--color-bg-modal);
+}
+
+.c-modal-confirm .message {
+  box-sizing: border-box;
+  padding: 60px 60px;
+  width: 60%;
+  max-width: 800px;
+  min-height: 230px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background-color: var(--color-bg-white);
+  border: 1px solid var(--color-border-gray);
+  border-radius: 5px;
+  animation: modalScale 0.5s ease forwards;
+}
+
+@keyframes modalScale {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+
+@media screen and (max-width: 1000px) {
+  .c-modal-confirm .message {
+    width: 80%;
+  }
+}
+
+.c-modal-confirm .message-wrapper {
+  width: 100%;
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.c-modal-confirm .title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.c-modal-confirm .content {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.c-modal-confirm .content:first-of-type {
+  margin-top: 20px;
+}
+
+.c-modal-confirm .error {
+  color: var(--color-font-red);
+}
+
+.c-modal-confirm .btn {
+  margin-top: 10px;
+}
+
+/* ---------------------- */
 /* ラベル
 /* ---------------------- */
 .c-label {
@@ -507,13 +621,13 @@ a:hover {
 
 .c-table .header th {
   padding-top: 15px;
-  padding-bottom: 12px;
+  padding-bottom: 15px;
   font-weight: 700;
 }
 
 .c-table .data td {
   padding-top: 15px;
-  padding-bottom: 12px;
+  padding-bottom: 15px;
   border-top: 3px solid var(--color-border-light-gray);
 }
 
@@ -529,14 +643,32 @@ a:hover {
   width: 238px;
 }
 
+@media screen and (max-width: 1000px) {
+  .c-table--attendance-list .header th:first-child,
+  .c-table--attendance-list .data td:first-child {
+    padding-left: 30px;
+    width: 200px;
+  }
+}
+
 /* stamp-correction-request関係 */
 .c-table--stamp-correction-request .header th:first-child,
 .c-table--stamp-correction-request .data td:first-child {
-  padding-left: 55px;
-  width: 238px;
+  padding-left: 20px;
+  width: 120px;
 }
 
-/* staff-listのレスポンシブ対応すること */
+.c-table--stamp-correction-request .header th:nth-child(4),
+.c-table--stamp-correction-request .data td:nth-child(4) {
+  padding-right: 10px;
+  width: 180px;
+  line-height: 1.2;
+}
+
+.c-table--stamp-correction-request .header th:last-child,
+.c-table--stamp-correction-request .data td:last-child {
+  padding-right: 10px;
+}
 
 /* staff-list関係 */
 .c-table--staff-list .header th:first-child,
@@ -547,20 +679,19 @@ a:hover {
 
 .c-table--staff-list .header th:last-child,
 .c-table--staff-list .data td:last-child {
-  width: 150px;
+  width: 120px;
 }
 
-@media screen and (max-width: 1000px) {
-  .c-table--attendance-list .header th:first-child,
-  .c-table--attendance-list .data td:first-child {
+@media screen and (max-width: 800px) {
+  .c-table--staff-list .header th:first-child,
+  .c-table--staff-list .data td:first-child {
     padding-left: 30px;
     width: 200px;
   }
 
-  .c-table--stamp-correction-request .header th:first-child,
-  .c-table--stamp-correction-request .data td:first-child {
-    padding-left: 30px;
-    width: 200px;
+  .c-table--staff-list .header th:last-child,
+  .c-table--staff-list .data td:last-child {
+    width: 100px;
   }
 }
 
@@ -568,6 +699,7 @@ a:hover {
 /* 詳細テーブル
 /* ---------------------- */
 .c-table-detail {
+  padding-bottom: 18px;
   color: var(--color-font-light-gray);
   font-weight: 700;
   background-color: var(--color-bg-white);
@@ -592,7 +724,11 @@ a:hover {
   border-bottom: 2px solid var(--color-border-light-gray);
 }
 
-.c-table-detail .name {
+.c-table-detail .request-id,
+.c-table-detail .request-date,
+.c-table-detail .name,
+.c-table-detail .date,
+.c-table-detail .time {
   padding-left: 24px;
 }
 
@@ -619,13 +755,36 @@ a:hover {
   display: inline-block;
 }
 
-.c-table-detail .remarks {
-  margin: 18px 0;
+.c-table-detail .remarks-textarea {
+  margin: 18px 0 0;
   padding-left: 8px;
-  padding-top: 3px;
+  padding-top: 5px;
   width: 316px;
   height: 90px;
   border: 1px solid var(--color-border-light-gray);
+}
+
+.c-table-detail .remarks-pre {
+  padding-left: 24px;
+  width: 350px;
+  line-height: 1.8;
+}
+
+/* エラーメッセージ対応（上書き） */
+/* .c-table-detail tr:has(+ .error) th {
+  padding-bottom: 0;
+  border-bottom: none;
+} */
+
+
+
+/* ---------------------- */
+/* <pre>への対応
+/* ---------------------- */
+.c-pre {
+  font-family: inherit;  /* 等幅フォントを解除 */
+  white-space: pre-wrap;  /* 改行を保持しつつ折り返し */
+  word-wrap: break-word;    /* 長い単語も折り返し */
 }
 
 /* =========================== */
@@ -668,7 +827,6 @@ body {
 /* bladeレイアウト
 /*
 /* =========================== */
-
 .l-container-60 {
   margin: 0 auto;
   width: 60%;
@@ -818,7 +976,7 @@ body {
 }
 
 #attendance-register .label {
-  margin: 80px auto 0;
+  margin: 60px auto 0;
 }
 
 #attendance-register .date {
@@ -827,9 +985,32 @@ body {
 }
 
 #attendance-register .time {
-  margin-top: 40px;
+  margin-top: 20px;
   font-size: 5rem;
   font-weight: 700;
+}
+
+#attendance-register .time--opacity {
+  opacity: 0.3;
+}
+
+#attendance-register .reload {
+  margin: 18px auto 0;
+  width: 200px;
+  display: block;
+  position: relative;
+  color: var(--color-font-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+#attendance-register .reload::before {
+  content: '';
+  width: 173px;
+  position: absolute;
+  top: calc(100% + 4px);
+  border-bottom: 1px solid var(--color-font-blue);
 }
 
 #attendance-register .buttons {
@@ -845,7 +1026,6 @@ body {
 }
 
 #attendance-register .message {
-  margin-top: 50px;
   font-size: 2rem;
   text-align: center;
 }
@@ -861,7 +1041,12 @@ body {
 }
 
 #attendance-list .table {
-  margin: 46px 0 114px;
+  margin: 46px 0 0;
+}
+
+/* ボタンがない場合はdivを置いてマージンを作る */
+#attendance-list .margin {
+  margin-bottom: 114px;
 }
 
 #attendance-list .month {
@@ -882,7 +1067,8 @@ body {
 }
 
 #attendance-list .month-prev {
-  margin-left: 52px;
+  padding-left: 52px;
+  display: block;
 }
 
 #attendance-list .month-prev::before {
@@ -891,7 +1077,7 @@ body {
   height: 15px;
   display: inline-block;
   position: absolute;
-  left: -27px;
+  left: 24px;
   top: 2px;
   background-image: url(../img/icon_prev_arrow.jpg);
   background-size: cover;
@@ -916,7 +1102,8 @@ body {
 }
 
 #attendance-list .month-next {
-  margin-right  : 52px;
+  padding-right  : 52px;
+  display: block;
 }
 
 #attendance-list .month-next::before {
@@ -925,10 +1112,27 @@ body {
   height: 15px;
   display: inline-block;
   position: absolute;
-  right: -27px;
+  right: 24px;
   top: 2px;
   background-image: url(../img/icon_next_arrow.jpg);
   background-size: cover;
+}
+
+#attendance-list .month-opacity-0 {
+  opacity: 0;
+}
+
+#attendance-list .no-data-message {
+  margin-top: 46px;
+  text-align: center;
+}
+
+#attendance-list .data-no-registration {
+  width: calc(100% - 238px);
+}
+
+#attendance-list .button {
+  margin: 30px 0 84px auto;
 }
 
 /* ----------------------- */
@@ -936,6 +1140,24 @@ body {
 /* 申請一覧（#stamp-correction-request）
 /* c-tableを使用
 /* ----------------------- */
+#stamp-correction-request .container {
+  margin: 0 auto;
+  width: 60%;
+  max-width: 900px;
+}
+
+@media screen and (max-width: 1300px) {
+  #stamp-correction-request .container {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  #stamp-correction-request .container {
+    width: 95%;
+  }
+}
+
 #stamp-correction-request .titles {
   margin-top: 65px;
   padding-bottom: 17px;
@@ -963,7 +1185,13 @@ body {
 /* 申請一覧（#attendance-detail）
 /* c-table-detailを使用
 /* ----------------------- */
-#attendance-detail .table {
+/* モーダル用 */
+#attendance-detail {
+  position: relative;
+}
+
+#attendance-detail .edit-table,
+#attendance-detail .request-content-table {
   margin: 30px 0 20px;
 }
 
@@ -971,3 +1199,134 @@ body {
   margin-bottom: 43px;
 }
 
+#attendance-detail .request-content-message {
+  margin: 10px 0 43px;
+  color: var(--color-font-red);
+  text-align: right;
+}
+
+#attendance-detail .not-applicable-message {
+  margin-top: 60px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+/* ----------------------- */
+/* staff_list.blade.php
+/* スタッフ一覧（#staff-list）
+/* c-table, c-table--staffを使用
+/* ----------------------- */
+
+#staff-list .container {
+  margin: 0 auto;
+  width: 60%;
+  max-width: 900px;
+}
+
+@media screen and (max-width: 1300px) {
+  #staff-list .container {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  #staff-list .container {
+    width: 95%;
+  }
+}
+
+#staff-list .table {
+  margin: 30px 0 50px;
+}
+
+/* ----------------------- */
+/* admin_daily_attendance_list.blade.php
+/* 勤怠一覧（#attendance-list）
+/* c-tableを使用
+/* ----------------------- */
+#admin-daily-attendance-list {
+  background-color: var(--color-bg-base);
+  overflow: hidden;
+}
+
+#admin-daily-attendance-list .table {
+  margin: 46px 0 114px;
+}
+
+#admin-daily-attendance-list .day {
+  margin-top: 47px;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-white);
+  border-radius: 10px;
+}
+
+#admin-daily-attendance-list .day-prev,
+#admin-daily-attendance-list .day-next {
+  position: relative;
+  color: var(--color-font-light-gray);
+}
+
+#admin-daily-attendance-list .day-prev {
+  padding-left: 52px;
+  display: block;
+}
+
+#admin-daily-attendance-list .day-prev::before {
+  content: '';
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  position: absolute;
+  left: 24px;
+  top: 2px;
+  background-image: url(../img/icon_prev_arrow.jpg);
+  background-size: cover;
+}
+
+#admin-daily-attendance-list .day-current {
+  position: relative;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+#admin-daily-attendance-list .day-current::before {
+  content: '';
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  position: absolute;
+  top: -3px;
+  left: -35px;
+  background-image: url(../img/icon_calendar.jpg);
+  background-size: cover;
+}
+
+#admin-daily-attendance-list .day-next {
+  padding-right  : 52px;
+  display: block;
+}
+
+#admin-daily-attendance-list .day-next::before {
+  content: '';
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  position: absolute;
+  right: 24px;
+  top: 2px;
+  background-image: url(../img/icon_next_arrow.jpg);
+  background-size: cover;
+}
+
+#admin-daily-attendance-list .day-opacity-0 {
+  opacity: 0;
+}
+
+#admin-daily-attendance-list .no-data-message {
+  margin-top: 46px;
+  text-align: center;
+}

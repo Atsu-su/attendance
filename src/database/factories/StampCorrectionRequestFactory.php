@@ -22,7 +22,7 @@ class ApplicationFactory extends Factory
             'start_time' => $this->faker->time('H:i', '08:30', '11:00'),
             'end_time' => $this->faker->time('H:i', '16:00', '18:00'),
             'break_time' => $this->faker->time('H:i', '00:20', '01:30'),
-            'reason' => $this->faker->sentence(),
+            'remarks' => $this->faker->sentence(),
         ];
     }
 }
