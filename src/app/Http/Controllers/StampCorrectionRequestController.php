@@ -3,32 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\StampCorrectionRequest;
+use App\Traits\DateTimeFormatTrait;
 use Illuminate\Http\Request;
 
 class StampCorrectionRequestController extends Controller
 {
+    use DateTimeFormatTrait;
+
     public function index()
     {
         $user =  auth()->user();
         $requests =  StampCorrectionRequest::with('user')
             ->where('user_id', $user->id)
-            ->get();
-
-        // date/timeのフォーマットを変更
-        foreach ($requests as $request) {
-            $request->request_date = date('Y/m/d', strtotime($request->request_date));
-            $request->date = date('Y/m/d', strtotime($request->date));
-            $request->start_time = date('H:i', strtotime($request->start_time));
-            $request->end_time = date('H:i', strtotime($request->end_time));
-            $request->break_time = date('H:i', strtotime($request->break_time));
-        }
+            ->get()
+            ->map(function ($request) {
+                $request->request_date = $this->dateFormatConvert($request->request_date);
+                $request->date = $this->dateFormatConvert($request->date);
+                return $request;
+            });
 
         return view('stamp_correction_request_list', compact('requests'));
-    }
-
-    public function edit()
-    {
-        //
     }
 
     // 管理者編

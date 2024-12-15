@@ -15,6 +15,8 @@ class CreateStampCorrectionRequestsTable extends Migration
     {
         Schema::create('stamp_correction_requests', function (Blueprint $table) {
             $table->id();
+
+            // user_idは不要でattendance_idを持つように変更する
             $table->unsignedBigInteger('user_id');
             $table->boolean('is_approved')->default(false)->comment('0: pending approval, 1: approved');
             $table->date('request_date');

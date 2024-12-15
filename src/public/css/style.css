@@ -598,6 +598,10 @@ a:hover {
   padding-left: 24px;
 }
 
+.c-table-detail .date {
+  padding-left: 24px;
+}
+
 .c-table-detail .input-date {
   padding-left: 20px;
   width: 206px;

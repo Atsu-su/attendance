@@ -21,7 +21,8 @@ class AttendanceSeeder extends Seeder
     {
         $startTime = ['08:30', '09:00', '09:30', '10:00', '10:30'];
         $endTime = ['17:30', '18:00', '18:30', '19:00', '19:30'];
-        $breakTime = ['00:30', '01:00', '01:30', '02:00', '02:30'];
+        $breakStartTime = ['11:30' ,'11:40', '11:50', '12:00', '12:10'];
+        $breakEndTime = ['12:30', '12:40', '12:50', '13:00', '13:10'];
 
         for ($j = 1; $j <= User::count(); $j++) {
             $user = User::find($j);
@@ -34,7 +35,8 @@ class AttendanceSeeder extends Seeder
                     'date' => $date->toDateString(),
                     'start_time' => Arr::random($startTime),
                     'end_time' => Arr::random($endTime),
-                    'break_time' => Arr::random($breakTime),
+                    'break_start_time' => Arr::random($breakStartTime),
+                    'break_end_time' => Arr::random($breakEndTime),
                 ]);
 
                 $date->addDay();
@@ -46,7 +48,8 @@ class AttendanceSeeder extends Seeder
                 'date' => $date->toDateString(),
                 'start_time' => Arr::random($startTime),
                 'end_time' => null,
-                'break_time' => null,
+                'break_start_time' => null,
+                'break_end_time' => null,
             ]);
         }
     }

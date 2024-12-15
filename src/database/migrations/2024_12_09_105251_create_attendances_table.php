@@ -20,7 +20,8 @@ class CreateAttendancesTable extends Migration
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time')->nullable();
-            $table->string('break_time')->nullable();
+            $table->time('break_start_time')->nullable();
+            $table->time('break_end_time')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
