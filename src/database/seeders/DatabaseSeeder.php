@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             AdminSeeder::class,
-            StampCorrectionRequestSeeder::class,
             AttendanceSeeder::class,
+            StampCorrectionRequestSeeder::class,
       ]);
     }
 }

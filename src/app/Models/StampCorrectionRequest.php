@@ -15,6 +15,10 @@ class StampCorrectionRequest extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function attendance() {
+        return $this->belongsTo(Attendance::class);
+    }
+
     public function getApprovalStatusAttribute() {
         return $this->is_approved ? '承認済' : '未承認';
     }

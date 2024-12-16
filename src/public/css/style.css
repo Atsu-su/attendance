@@ -388,7 +388,7 @@ a:hover {
 }
 
 /* ---------------------- */
-/* モーダル
+/* DB処理完了メッセージ用モーダル
 /* ---------------------- */
 .c-modal {
   width: 100vw;
@@ -396,6 +396,11 @@ a:hover {
   position: fixed;
   z-index: 100;
   background-color: var(--color-bg-modal);
+}
+
+.c-modal--confirm {
+  top: 0;
+  left: 0;
 }
 
 .c-modal .message {
@@ -409,7 +414,7 @@ a:hover {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  background-color: var(--color-bg-btn-white);
+  background-color: var(--color-bg-white);
   border: 1px solid var(--color-border-gray);
   border-radius: 5px;
   animation: modalScale 0.5s ease forwards;
@@ -463,6 +468,87 @@ a:hover {
 }
 
 .c-modal .btn {
+  margin-top: 10px;
+}
+
+/* ---------------------- */
+/* 処理実行継続確認用モーダル
+/* ---------------------- */
+.c-modal-confirm {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  background-color: var(--color-bg-modal);
+}
+
+.c-modal-confirm .message {
+  box-sizing: border-box;
+  padding: 60px 60px;
+  width: 60%;
+  max-width: 800px;
+  min-height: 230px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background-color: var(--color-bg-white);
+  border: 1px solid var(--color-border-gray);
+  border-radius: 5px;
+  animation: modalScale 0.5s ease forwards;
+}
+
+@keyframes modalScale {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+
+@media screen and (max-width: 1000px) {
+  .c-modal-confirm .message {
+    width: 80%;
+  }
+}
+
+.c-modal-confirm .message-wrapper {
+  width: 100%;
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+.c-modal-confirm .title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.c-modal-confirm .content {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.c-modal-confirm .content:first-of-type {
+  margin-top: 20px;
+}
+
+.c-modal-confirm .error {
+  color: var(--color-font-red);
+}
+
+.c-modal-confirm .btn {
   margin-top: 10px;
 }
 
@@ -563,7 +649,20 @@ a:hover {
 
 .c-table--staff-list .header th:last-child,
 .c-table--staff-list .data td:last-child {
-  width: 150px;
+  width: 120px;
+}
+
+@media screen and (max-width: 800px) {
+  .c-table--staff-list .header th:first-child,
+  .c-table--staff-list .data td:first-child {
+    padding-left: 30px;
+    width: 200px;
+  }
+
+  .c-table--staff-list .header th:last-child,
+  .c-table--staff-list .data td:last-child {
+    width: 100px;
+  }
 }
 
 /* ---------------------- */
@@ -599,6 +698,10 @@ a:hover {
 }
 
 .c-table-detail .date {
+  padding-left: 24px;
+}
+
+.c-table-detail .time {
   padding-left: 24px;
 }
 
@@ -674,7 +777,6 @@ body {
 /* bladeレイアウト
 /*
 /* =========================== */
-
 .l-container-60 {
   margin: 0 auto;
   width: 60%;
@@ -987,7 +1089,12 @@ body {
 /* 申請一覧（#attendance-detail）
 /* c-table-detailを使用
 /* ----------------------- */
-#attendance-detail .table {
+/* モーダル用 */
+#attendance-detail {
+  position: relative;
+}
+
+#attendance-detail .edit-table {
   margin: 30px 0 20px;
 }
 
@@ -995,3 +1102,36 @@ body {
   margin-bottom: 43px;
 }
 
+#attendance-detail .request-content-message {
+  margin: 10px 0 43px;
+  color: var(--color-font-red);
+  text-align: right;
+}
+
+/* ----------------------- */
+/* staff_list.blade.php
+/* スタッフ一覧（#staff-list）
+/* c-table, c-table--staffを使用
+/* ----------------------- */
+
+#staff-list .container {
+  margin: 0 auto;
+  width: 60%;
+  max-width: 900px;
+}
+
+@media screen and (max-width: 1300px) {
+  #staff-list .container {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  #staff-list .container {
+    width: 95%;
+  }
+}
+
+#staff-list .table {
+  margin: 30px 0 50px;
+}

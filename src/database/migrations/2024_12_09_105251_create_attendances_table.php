@@ -24,6 +24,8 @@ class CreateAttendancesTable extends Migration
             $table->time('break_end_time')->nullable();
             $table->timestamps();
 
+            // ユーザIDと日付の組み合わせでユニークにする
+            $table->unique(['user_id', 'date']);
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

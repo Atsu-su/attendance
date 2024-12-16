@@ -81,6 +81,37 @@
         label.textContent = '勤務中';
         toggleClass(onDutyButton); // 非表示
         toggleClass(leaveButtons); // 表示
+
+        // ----------------------------------------------
+
+        // いいねボタンの参考
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrf}
+        }).then(response =>  {
+            if (!response.ok) {
+              throw new Error('Network response was not OK');
+            }
+            return response.json();
+        }).then(data => {
+            const likeIcon = document.getElementById('like-icon');
+            const likes = document.getElementById('number-of-likes');
+            if (data.likeIt) {
+              likes.textContent = parseInt(likes.textContent) + 1;  // いいねの数を増やす
+              likeIcon.classList.add('filled'); // 星の色を黄色に変更
+            } else {
+              likes.textContent = parseInt(likes.textContent) - 1;  // いいねの数を減らす
+              likeIcon.classList.remove('filled'); // 星の色を白色に変更
+            }
+        }).catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        }).finally(() => {
+          // 重複処理抑止用2
+          icon.classList.remove('js-processing');
+        });
+        // ----------------------------------------------
     });
 
     // 休憩入ボタンのクリックイベント

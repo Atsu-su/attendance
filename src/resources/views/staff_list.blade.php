@@ -4,8 +4,8 @@
   @include('components.header')
 @endsection
 @section('content')
-  <div id="attendance-list" class="cmn-page">
-    <div class="l-container-60">
+  <div id="staff-list" class="cmn-page">
+    <div class="container">
       <h1 class="c-title">スタッフ一覧</h1>
       <table class="c-table c-table--staff-list table">
         <tr class="header">
