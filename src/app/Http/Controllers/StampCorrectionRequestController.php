@@ -29,5 +29,5 @@ class StampCorrectionRequestController extends Controller
     //
     // 申請一覧表示
     // 申請詳細表示
-    // 申請承認
+    // 申請承認と結果画面表示
 }
