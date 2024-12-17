@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Models\BreakTime;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -21,23 +22,30 @@ class AttendanceSeeder extends Seeder
     {
         $startTime = ['08:30', '09:00', '09:30', '10:00', '10:30'];
         $endTime = ['17:30', '18:00', '18:30', '19:00', '19:30'];
-        $breakStartTime = ['11:30' ,'11:40', '11:50', '12:00', '12:10'];
-        $breakEndTime = ['12:30', '12:40', '12:50', '13:00', '13:10'];
+        $breakStartTime = ['11:30' ,'12:40', '13:50'];
+        $breakEndTime = ['12:30', '13:40', '14:50'];
 
         for ($j = 1; $j <= User::count(); $j++) {
             $user = User::find($j);
             $date = Carbon::now();
 
             for ($i = 0; $i < 60; $i++) {
-                Attendance::create([
+                $attendance = Attendance::create([
                     'user_id' => $user->id,
                     'status' => 'off_duty',
                     'date' => $date->toDateString(),
                     'start_time' => Arr::random($startTime),
                     'end_time' => Arr::random($endTime),
-                    'break_start_time' => Arr::random($breakStartTime),
-                    'break_end_time' => Arr::random($breakEndTime),
                 ]);
+
+                $hmax = ($i + 1) % 3 == 0 ? 3 : ($i + 1) % 3;
+                for ($h = 0; $h < $hmax; $h++) {
+                    BreakTime::create([
+                        'attendance_id' => $attendance->id,
+                        'start_time' => $breakStartTime[$h],
+                        'end_time' => $breakEndTime[$h],
+                    ]);
+                }
 
                 $date->addDay();
             }
@@ -48,8 +56,6 @@ class AttendanceSeeder extends Seeder
                 'date' => $date->toDateString(),
                 'start_time' => Arr::random($startTime),
                 'end_time' => null,
-                'break_start_time' => null,
-                'break_end_time' => null,
             ]);
         }
     }

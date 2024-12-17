@@ -34,9 +34,9 @@ Route::get('/verify', function(){
 
 // ヘッダーのミドルウェア
 Route::middleware('header')->group(function () {
-    Route::get('/attendance', function(){
-        return view('attendance_register');
-    });
+    // Route::get('/attendance', function(){
+    //     return view('attendance_register');
+    // });
 
     Route::get('/list', function() {
         return view('attendance_list');
@@ -63,9 +63,11 @@ Route::middleware('header')->group(function () {
     });
 
     Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/attendance', [AttendanceController::class, 'index'])
+            ->name('attendance.index');
+        Route::get('/attendance/{id}', [AttendanceController::class, 'show'])
+            ->name('attendance.show');
         Route::get('/stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
             ->name('stamp_correction_request.list');
-        Route::get('/attendance/{id}', [AttendanceController::class, 'edit'])
-            ->name('attendance.edit');
     });
 });

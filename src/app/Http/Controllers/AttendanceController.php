@@ -4,19 +4,50 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StampCorrectionRequest;
 use App\Models\Attendance;
+use App\Models\BreakTime;
 use App\Models\StampCorrectionRequest as ModelsStampCorrectionRequest;
-use App\Traits\DateTimeFormatTrait;
+use Exception;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
-    use DateTimeFormatTrait;
-
     // ユーザ編
-    //
-    // 出勤のAPI
-    function startWork()
+    // 時刻表示画面
+    public function index()
     {
+        // ----------------------------------
+        // テスト用の日付
+        $now = now()->addDays(-17);
+        // $now = now();
+        // ----------------------------------
+
+        $attendance = Attendance::where('user_id', auth()->id())
+            ->where('date', $now->format('Y-m-d'))
+            ->first();
+
+        if (!$attendance) {
+            $attendance = Attendance::create([
+                'user_id' => auth()->id(),
+                'date' => $now->format('Y-m-d'),
+                'status' => Attendance::BF_WORK
+            ]);
+        }
+
+        return view('attendance_register', compact('now', 'attendance'));
+    }
+
+    // viewのjs-hiddenのクラスを状態によって付け替えて表示を変える
+    // 注意すべきはjs-hiddenを取り除かれて他のアクションが取られること
+    // テーブルや勤怠のステータスに応じてAPI側で適切な処理かどうかの
+    // 判定を行うこと
+    // view側でも例えば、勤怠が開始した後は勤怠開始ボタンは表示しない
+    // ようにする（二重は不要かも）
+
+    // 出勤のAPI
+    public function startWorkApi()
+    {
+        // 出勤処理がされていないか確認
+
         // 日付・時刻の取得
         $now = now();
         $date = $now->format('Y-m-d');
@@ -49,10 +80,12 @@ class AttendanceController extends Controller
     // 勤怠詳細の表示
     // スタッフ別勤怠一覧の表示
 
-    public function edit($id)
+    // 申請用の画面表示
+    public function show($id)
     {
         // 申請は複数回可能なため最後の申請を取得
-        $request = ModelsStampCorrectionRequest::where('attendance_id', $id)
+        $request = ModelsStampCorrectionRequest::with('requestBreakTimes')
+            ->where('attendance_id', $id)
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -60,24 +93,40 @@ class AttendanceController extends Controller
         if (!$request || $request->is_approved == 1) {
             $isApplicable = true;
 
+            // 勤怠情報の取得
             $attendance = Attendance::with('user')->find($id);
-            $attendance->date = $this->dateFormatConvert($attendance->date);
-            $attendance->start_time = $this->timeFormatConvert($attendance->start_time);
-            $attendance->end_time = $this->timeFormatConvert($attendance->end_time);
-            $attendance->break_start_time = $this->timeFormatConvert($attendance->break_start_time);
-            $attendance->break_end_time = $this->timeFormatConvert($attendance->break_end_time);
+            $attendance->date = $attendance->dateFormatConvert($attendance->date);
+            $attendance->start_time = $attendance->timeFormatConvert($attendance->start_time);
+            $attendance->end_time = $attendance->timeFormatConvert($attendance->end_time);
+            $attendance->break_start_time = $attendance->timeFormatConvert($attendance->break_start_time);
+            $attendance->break_end_time = $attendance->timeFormatConvert($attendance->break_end_time);
 
-            return view('attendance_detail', compact('attendance', 'isApplicable'));
+            // 休憩時間の取得
+            $breakTimes = BreakTime::where('attendance_id', $attendance->id)
+                ->get()
+                ->map(function ($breakTime) {
+                    $breakTime->start_time = $breakTime->timeFormatConvert($breakTime->start_time);
+                    $breakTime->end_time = $breakTime->timeFormatConvert($breakTime->end_time);
+                    return $breakTime;
+                });
+
+            return view('attendance_detail', compact('attendance', 'breakTimes', 'isApplicable'));
         } else {
             $isApplicable = false;
 
-            $request->request_date = $this->dateFormatConvert($request->request_date);
-            $request->start_time = $this->timeFormatConvert($request->start_time);
-            $request->end_time = $this->timeFormatConvert($request->end_time);
-            $request->break_start_time = $this->timeFormatConvert($request->break_start_time);
-            $request->break_end_time = $this->timeFormatConvert($request->break_end_time);
+            $request->date = $request->dateFormatConvert($request->attendance->date);
+            $request->start_time = $request->timeFormatConvert($request->start_time);
+            $request->end_time = $request->timeFormatConvert($request->end_time);
 
-            return view('attendance_detail', compact('request', 'isApplicable'));
+            $requestBreakTimes = $request
+                ->requestBreakTimes
+                ->map(function ($requestBreakTime) {
+                    $requestBreakTime->start_time = $requestBreakTime->timeFormatConvert($requestBreakTime->start_time);
+                    $requestBreakTime->end_time = $requestBreakTime->timeFormatConvert($requestBreakTime->end_time);
+                    return $requestBreakTime;
+                });
+
+            return view('attendance_detail', compact('request', 'requestBreakTimes', 'isApplicable'));
         }
 
 

@@ -6,22 +6,22 @@ use Carbon\Carbon;
 
 trait DateTimeFormatTrait
 {
-    protected function isValidTF($time) //TF = TimeFormat
+    public function isValidTF($time) //TF = TimeFormat
     {
         return preg_match('/^([0-1][0-9]|2[0-3]):([0-5][0-9])$/', $time);
     }
 
-    protected function dateFormatConvert($date)
+    public function dateFormatConvert($date)
     {
         return date('Y/m/d', strtotime($date));
     }
 
-    protected function timeFormatConvert($time)
+    public function timeFormatConvert($time)
     {
         return date('H:i', strtotime($time));
     }
 
-    protected function diffTime($time1, $time2)
+    public function diffTime($time1, $time2)
     {
         $diff = Carbon::parse($time1)->diff(Carbon::parse($time2));
         return $diff->format('%H:%I');

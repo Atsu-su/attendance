@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\StampCorrectionRequest;
-use App\Traits\DateTimeFormatTrait;
 use Illuminate\Http\Request;
 
 class StampCorrectionRequestController extends Controller
 {
-    use DateTimeFormatTrait;
-
     public function index()
     {
         $user =  auth()->user();
@@ -17,8 +14,8 @@ class StampCorrectionRequestController extends Controller
             ->where('user_id', $user->id)
             ->get()
             ->map(function ($request) {
-                $request->request_date = $this->dateFormatConvert($request->request_date);
-                $request->date = $this->dateFormatConvert($request->date);
+                $request->request_date = $request->dateFormatConvert($request->request_date);
+                $request->date = $request->dateFormatConvert($request->date);
                 return $request;
             });
 

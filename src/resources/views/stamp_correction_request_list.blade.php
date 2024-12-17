@@ -28,9 +28,9 @@
                   <td>{{ $request->approval_status }}</td>
                   <td>{{ $request->user->name }}</td>
                   <td>{{ $request->date }}</td>
-                  <td>{{ $request->reason}}</td>
+                  <td>{{ $request->remarks }}</td>
                   <td>{{ $request->request_date}}</td>
-                  <td><a href="">詳細</a></td>
+                  <td><a href="{{ route('attendance.edit', $request->id) }}">詳細</a></td>
                 </tr>
               @endif
             @endforeach
@@ -52,9 +52,9 @@
                   <td>{{ $request->approval_status }}</td>
                   <td>{{ $request->user->name }}</td>
                   <td>{{ $request->date }}</td>
-                  <td>{{ $request->reason}}</td>
+                  <td>{{ $request->remarks }}</td>
                   <td>{{ $request->request_date}}</td>
-                  <td><a href="">詳細</a></td>
+                  <td><a href="{{ route('attendance.edit', $request->id) }}">詳細</a></td>
                 </tr>
               @endif
             @endforeach
