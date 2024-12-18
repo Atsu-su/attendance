@@ -20,6 +20,7 @@ class AttendanceSeeder extends Seeder
      */
     public function run()
     {
+        $days = 60;
         $startTime = ['08:30', '09:00', '09:30', '10:00', '10:30'];
         $endTime = ['17:30', '18:00', '18:30', '19:00', '19:30'];
         $breakStartTime = ['11:30' ,'12:40', '13:50'];
@@ -27,9 +28,9 @@ class AttendanceSeeder extends Seeder
 
         for ($j = 1; $j <= User::count(); $j++) {
             $user = User::find($j);
-            $date = Carbon::now();
+            $date = Carbon::now()->addDays(- $days - 1);    // 1つon_dutyで作成するため
 
-            for ($i = 0; $i < 60; $i++) {
+            for ($i = 0; $i < $days; $i++) {
                 $attendance = Attendance::create([
                     'user_id' => $user->id,
                     'status' => 'off_duty',

@@ -7,7 +7,9 @@
   <div id="attendance-register" class="cmn-page">
     <p id="label" class="c-label label">{{ $attendance->work_status }}</p>
     <p id="date" class="date">{{ $now->isoFormat('YYYY年MM月DD日(ddd)'); }}</p>
-    <p id="time" class="time">{{ $now->format('H:i') }}</p>
+    <p id="time" class="time{{ $attendance->status == \App\Models\Attendance::OFF_DUTY ? ' time--opacity' : ''}}">
+      {{ $attendance->status == \App\Models\Attendance::OFF_DUTY ? $attendance->timeFormatConvert($attendance->end_time) : $now->format('H:i') }}
+    </p>
     <div id="buttons" class="buttons">
       <button id="on-duty-button" class="c-btn c-btn--black c-btn--attendance-register {{ $attendance->status == \App\Models\Attendance::BF_WORK ? '' : 'js-hidden' }}">出勤</button>
       <div id="leave-buttons" class="buttons-leave {{ $attendance->status == \App\Models\Attendance::ON_DUTY ? '' : 'js-hidden' }}">
@@ -32,18 +34,42 @@
       }
     }
 
+    async function getResponseJson(url, csrf) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrf}
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not OK');
+        }
+
+        return response.ok;
+
+      } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+        return false;
+      }
+    }
+
     /* ------------------ */
     /* メイン
     /* ------------------ */
 
+    const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    // URL
+    const urlStartWork = '/attendance/startwork';
+    const urlEndWork = '/attendance/endwork';
+    const urlStartBreak = '/attendance/startbreak';
+    const urlEndBreak = '/attendance/endbreak';
+
     /* ------------------ */
     /* EventListener
     /* ------------------ */
-
-    // ページ移動時にタイマーを停止
-    window.addEventListener('unload', () => {
-      clearInterval(timer);
-    });
 
     const label = document.getElementById('label');
     const buttons = document.getElementById('buttons')
@@ -55,64 +81,81 @@
     const message = document.getElementById('message');
 
     // 出勤ボタンのクリックイベント
-    onDutyButton.addEventListener('click', () => {
+    onDutyButton.addEventListener('click', async () => {
+      const status = await getResponseJson(urlStartWork, csrf);
+
+      if (status) {
         label.textContent = '勤務中';
         toggleClass(onDutyButton); // 非表示
         toggleClass(leaveButtons); // 表示
+      } else {
 
-        // ----------------------------------------------
+        // ----------------------------------
+        // エラーの処理は修正予定（モーダル化）
+        //
+        alert('出勤時間の登録ができませんでした');
+        // ----------------------------------
 
-        // いいねボタンの参考
-        // fetch(url, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'X-CSRF-TOKEN': csrf}
-        // }).then(response =>  {
-        //     if (!response.ok) {
-        //       throw new Error('Network response was not OK');
-        //     }
-        //     return response.json();
-        // }).then(data => {
-        //     const likeIcon = document.getElementById('like-icon');
-        //     const likes = document.getElementById('number-of-likes');
-        //     if (data.likeIt) {
-        //       likes.textContent = parseInt(likes.textContent) + 1;  // いいねの数を増やす
-        //       likeIcon.classList.add('filled'); // 星の色を黄色に変更
-        //     } else {
-        //       likes.textContent = parseInt(likes.textContent) - 1;  // いいねの数を減らす
-        //       likeIcon.classList.remove('filled'); // 星の色を白色に変更
-        //     }
-        // }).catch(error => {
-        //     console.error('There has been a problem with your fetch operation:', error);
-        // }).finally(() => {
-        //   // 重複処理抑止用2
-        //   icon.classList.remove('js-processing');
-        // });
-        // ----------------------------------------------
-    });
-
-    // 休憩入ボタンのクリックイベント
-    breakStartButton.addEventListener('click', () => {
-      label.textContent = '休憩中';
-      toggleClass(leaveButtons);   // 非表示
-      toggleClass(breakEndButton); // 表示
-    });
-
-    // 休憩終ボタンのクリックイベント
-    breakEndButton.addEventListener('click', () => {
-      label.textContent = '勤務中';
-      toggleClass(breakEndButton);   // 非表示
-      toggleClass(leaveButtons);     // 表示
+      }
     });
 
     // 退勤ボタンのクリックイベント
-    offDutyButton.addEventListener('click', () => {
-      label.textContent = '退勤済';
-      toggleClass(buttons);  // 非表示
-      toggleClass(message);  // 表示
-      time.style.opacity = 0.5;
+    offDutyButton.addEventListener('click', async () => {
+      const status = await getResponseJson(urlEndWork, csrf);
+
+      if (status) {
+        label.textContent = '退勤済';
+        toggleClass(buttons);  // 非表示
+        toggleClass(message);  // 表示
+        time.style.opacity = 0.5;
+        time.style.marginBottom = '50px';
+      } else {
+
+        // ----------------------------------
+        // エラーの処理は修正予定（モーダル化）
+        //
+        alert('退勤時間の登録ができませんでした');
+        // ----------------------------------
+
+      }
     });
 
+    // 休憩入ボタンのクリックイベント
+    breakStartButton.addEventListener('click', async () => {
+      const status = await getResponseJson(urlStartBreak, csrf);
+
+      if (status) {
+        label.textContent = '休憩中';
+        toggleClass(leaveButtons);   // 非表示
+        toggleClass(breakEndButton); // 表示
+      } else {
+
+        // ----------------------------------
+        // エラーの処理は修正予定（モーダル化）
+        //
+        alert('休憩開始時間の登録ができませんでした');
+        // ----------------------------------
+
+      }
+    });
+
+    // 休憩終ボタンのクリックイベント
+    breakEndButton.addEventListener('click', async () => {
+      const status = await getResponseJson(urlEndBreak, csrf);
+
+      if (status) {
+        label.textContent = '勤務中';
+        toggleClass(breakEndButton);   // 非表示
+        toggleClass(leaveButtons);     // 表示
+      } else {
+
+        // ----------------------------------
+        // エラーの処理は修正予定（モーダル化）
+        //
+        alert('休憩終了時間の登録ができませんでした');
+        // ----------------------------------
+
+      }
+    });
   </script>
 @endsection

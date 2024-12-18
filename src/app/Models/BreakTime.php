@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class BreakTime extends Model
 {
+    protected $guarded = ['id'];
+
     use HasFactory;
     use DateTimeFormatTrait;
 

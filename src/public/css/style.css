@@ -955,6 +955,10 @@ body {
   font-weight: 700;
 }
 
+#attendance-register .time--opacity {
+  opacity: 0.5;
+}
+
 #attendance-register .buttons {
   margin: 50px auto 0px;
   display: flex;
@@ -968,7 +972,6 @@ body {
 }
 
 #attendance-register .message {
-  margin-top: 50px;
   font-size: 2rem;
   text-align: center;
 }

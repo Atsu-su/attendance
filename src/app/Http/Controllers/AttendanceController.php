@@ -6,18 +6,37 @@ use App\Http\Requests\StampCorrectionRequest;
 use App\Models\Attendance;
 use App\Models\BreakTime;
 use App\Models\StampCorrectionRequest as ModelsStampCorrectionRequest;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
-    // ユーザ編
-    // 時刻表示画面
+    // ----------------------------------
+    // テスト用の日付
+    const DAY = 13;
+    private $now;
+
+    public function __construct()
+    {
+        $this->now = now()->addDays(self::DAY);
+    }
+    // ----------------------------------
+
     public function index()
     {
+        return redirect()->route('login');
+    }
+
+    // 勤怠登録トップ画面
+    public function register()
+    {
+        $user = auth()->user();
+
         // ----------------------------------
         // テスト用の日付
-        $now = now()->addDays(-17);
+        $now = $this->now;
         // $now = now();
         // ----------------------------------
 
@@ -26,52 +45,221 @@ class AttendanceController extends Controller
             ->first();
 
         if (!$attendance) {
-            $attendance = Attendance::create([
-                'user_id' => auth()->id(),
-                'date' => $now->format('Y-m-d'),
-                'status' => Attendance::BF_WORK
-            ]);
+            try {
+                $attendance = Attendance::create([
+                    'user_id' => $user->id,
+                    'date' => $now->format('Y-m-d'),
+                    'status' => Attendance::BF_WORK
+                ]);
+            } catch (Exception $e) {
+
+                // ----------------------------------
+                // 修正予定
+                //
+                Log::error($e->getMessage());
+                return '<p>勤怠管理システムが使用できません</p>';
+                // ----------------------------------
+
+            }
         }
 
         return view('attendance_register', compact('now', 'attendance'));
     }
 
-    // viewのjs-hiddenのクラスを状態によって付け替えて表示を変える
-    // 注意すべきはjs-hiddenを取り除かれて他のアクションが取られること
-    // テーブルや勤怠のステータスに応じてAPI側で適切な処理かどうかの
-    // 判定を行うこと
-    // view側でも例えば、勤怠が開始した後は勤怠開始ボタンは表示しない
-    // ようにする（二重は不要かも）
-
     // 出勤のAPI
     public function startWorkApi()
     {
-        // 出勤処理がされていないか確認
+        $user = auth()->user();
 
         // 日付・時刻の取得
-        $now = now();
+        // ----------------------------------
+        // テスト用の日付
+        $now = $this->now;
+        // $now = now();
+        // ----------------------------------
         $date = $now->format('Y-m-d');
-        $time = $now->format('H:i');
+        $time = $now->format('H:i:s');
 
         // attendancesテーブルへの登録
         try {
-        Attendance::create([
-            'user_id' => auth()->id(),
-            'date' => $date,
-            'attendance_start_time' => $time,
-        ]);
+            Attendance::where('user_id', $user->id)
+                ->where('date', $date)
+                ->update([
+                    'status' => Attendance::ON_DUTY,
+                    'start_time' => $time,
+                ]);
 
         // レスポンスの返却（json）
-        // return response()->json(['likeIt' => $likeIt]);
+        return response()->noContent();
+
         } catch (Exception $e) {
-            return response()->json(['error' => '出勤登録に失敗しました'], 500);
+            Log::error($e->getMessage());
+            return response()->json(null, 500);
+        }
+    }
+
+    // 退勤のAPI
+    public function endWorkApi()
+    {
+        $user = auth()->user();
+
+        // 日付・時刻の取得
+        // ----------------------------------
+        // テスト用の日付
+        $now = $this->now;
+        // $now = now();
+        // ----------------------------------
+        $date = $now->format('Y-m-d');
+        $time = $now->format('H:i:s');
+
+        // attendancesテーブルへの登録
+        try {
+            Attendance::where('user_id', $user->id)
+                ->where('date', $date)
+                ->update([
+                    'status' => Attendance::OFF_DUTY,
+                    'end_time' => $time,
+                ]);
+
+        // レスポンスの返却（json）
+        return response()->noContent();
+
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(null, 500);
         }
     }
 
     // 休憩開始のAPI
+    public function startBreakApi()
+    {
+        $user = auth()->user();
+
+        // 日付・時刻の取得
+        // ----------------------------------
+        // テスト用の日付
+        $now = $this->now;
+        // $now = now();
+        // ----------------------------------
+        $date = $now->format('Y-m-d');
+        $time = $now->format('H:i:s');
+
+        $attendance = Attendance::where('user_id', $user->id)
+            ->where('date', $date)
+            ->where('status', Attendance::ON_DUTY)
+            ->first();
+
+        if (!$attendance) {
+            Log::error('更新対象の勤怠情報が存在しません');
+            return response()->json(null, 400);
+        }
+
+        // break_timesテーブルへの登録とattendancesテーブルの更新
+        try {
+            BreakTime::create([
+                'attendance_id' => $attendance->id,
+                'start_time' => $time,
+            ]);
+
+            $attendance->update([
+                'status' => Attendance::BREAK
+            ]);
+
+        // レスポンスの返却（json）
+        return response()->noContent();
+
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(null, 500);
+        }
+    }
+
     // 休憩終了のAPI
-    // 退勤のAPI
+    public function endBreakApi()
+    {
+        $user = auth()->user();
+
+        // 日付・時刻の取得
+        // ----------------------------------
+        // テスト用の日付
+        $now = $this->now;
+        // $now = now();
+        // ----------------------------------
+        $date = $now->format('Y-m-d');
+        $time = $now->format('H:i:s');
+
+        $attendance = Attendance::where('user_id', $user->id)
+            ->where('date', $date)
+            ->where('status', Attendance::BREAK)
+            ->first();
+
+        if (!$attendance) {
+            Log::error('更新対象の勤怠情報が存在しません');
+            return response()->json(null, 400);
+        }
+
+        // break_timesテーブルとattendancesテーブルの更新
+        try {
+            BreakTime::where('attendance_id', $attendance->id)
+                ->orderBy('created_at', 'desc')
+                ->first()
+                ->update([
+                    'end_time' => $time,
+                ]);
+
+            $attendance->update([
+                'status' => Attendance::ON_DUTY
+            ]);
+
+        // レスポンスの返却（json）
+        return response()->noContent();
+
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(null, 500);
+        }
+    }
+
     // 勤怠一覧の表示
+    public function showList($year, $month)
+    {
+        $user = auth()->user();
+
+        $date = Carbon::create($year, $month);
+        $startOfMonth = $date->startOfMonth();
+        $endOfMonth = $date->endOfMonth();
+        $days = $startOfMonth->diff($endOfMonth)->days + 1;
+
+        $attendances = Attendance::with('breakTimes')
+            ->where('user_id', $user->id)
+            ->whereBetween('date', [
+                $startOfMonth->format('Y-m-d'),
+                $endOfMonth->format('Y-m-d')])
+            ->get()
+            ->map(function ($attendance) {
+                $attendance->date = $attendance->dateFormatConvert($attendance->date);
+                $attendance->start_time = $attendance->timeFormatConvert($attendance->start_time);
+                $attendance->end_time = $attendance->timeFormatConvert($attendance->end_time);
+
+                $totalBreakTime = 0;
+                $breakTimes = $attendance->breakTimes;
+
+                // この値が空
+                dd($breakTimes);
+
+                foreach ($breakTimes as $breakTime) {
+                    $startTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->start_time));
+                    $endTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->end_time));
+                    $totalBreakTime += $startTime->diffInMinutes($endTime);
+                }
+
+                $attendance->total_break_time = $totalBreakTime;
+
+                return $attendance;
+            });
+
+    }
+
     // 勤怠詳細の表示
 
     // 管理者編
