@@ -1008,7 +1008,8 @@ body {
 }
 
 #attendance-list .month-prev {
-  margin-left: 52px;
+  padding-left: 52px;
+  display: block;
 }
 
 #attendance-list .month-prev::before {
@@ -1017,7 +1018,7 @@ body {
   height: 15px;
   display: inline-block;
   position: absolute;
-  left: -27px;
+  left: 24px;
   top: 2px;
   background-image: url(../img/icon_prev_arrow.jpg);
   background-size: cover;
@@ -1042,7 +1043,8 @@ body {
 }
 
 #attendance-list .month-next {
-  margin-right  : 52px;
+  padding-right  : 52px;
+  display: block;
 }
 
 #attendance-list .month-next::before {
@@ -1051,10 +1053,23 @@ body {
   height: 15px;
   display: inline-block;
   position: absolute;
-  right: -27px;
+  right: 24px;
   top: 2px;
   background-image: url(../img/icon_next_arrow.jpg);
   background-size: cover;
+}
+
+#attendance-list .month-opacity-0 {
+  opacity: 0;
+}
+
+#attendance-list .no-data-message {
+  margin-top: 46px;
+  text-align: center;
+}
+
+#attendance-list .data-no-registration {
+  width: calc(100% - 238px);
 }
 
 /* ----------------------- */

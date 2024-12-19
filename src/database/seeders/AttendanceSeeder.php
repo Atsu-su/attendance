@@ -23,8 +23,8 @@ class AttendanceSeeder extends Seeder
         $days = 60;
         $startTime = ['08:30', '09:00', '09:30', '10:00', '10:30'];
         $endTime = ['17:30', '18:00', '18:30', '19:00', '19:30'];
-        $breakStartTime = ['11:30' ,'12:40', '13:50'];
-        $breakEndTime = ['12:30', '13:40', '14:50'];
+        $breakStartTime = ['11:19:23' ,'12:10:49', '13:34:21'];
+        $breakEndTime = ['12:23:10', '13:28:10', '14:50:50'];
 
         for ($j = 1; $j <= User::count(); $j++) {
             $user = User::find($j);

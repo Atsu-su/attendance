@@ -13,9 +13,40 @@ use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
+    /**
+     * 分のフォーマット変換
+     * @param int $mins
+     * @return string
+     *
+     * （注意）
+     * 引数がnullの場合はnullを返す
+     * 引数が0の場合は00:00を返す
+     *
+     * 例）126分 → 02:06
+     */
+    public function minutesFormatConvert($mins)
+    {
+        if ($mins === null) return null;
+
+        $hours = floor($mins / 60);
+        $minutes = $mins % 60;
+        return sprintf('%02d:%02d', $hours, $minutes);
+    }
+
+    /**
+     * 日付を日本語フォーマットへ変換
+     * @param string $date
+     * @return string
+     * 例）2024-01-01 → 2024年01月01日
+     */
+    public function toJapaneseDate($date)
+    {
+        return Carbon::parse($date)->isoFormat('YYYY年MM月DD日');
+    }
+
     // ----------------------------------
     // テスト用の日付
-    const DAY = 13;
+    const DAY = 1;
     private $now;
 
     public function __construct()
@@ -220,14 +251,25 @@ class AttendanceController extends Controller
         }
     }
 
-    // 勤怠一覧の表示
+    /**
+     * 勤怠一覧の表示
+     * @param int $year, $month
+     */
     public function showList($year, $month)
     {
         $user = auth()->user();
 
-        $date = Carbon::create($year, $month);
-        $startOfMonth = $date->startOfMonth();
-        $endOfMonth = $date->endOfMonth();
+        // ----------------------------------
+        //
+        // 日付・時間の取得
+        //
+        // ----------------------------------
+        // 基準となる日付（これを直接メソッドチェーンで使用しないこと）
+        $date = Carbon::create($year, $month, 1);
+        $date->settings(['monthOverflow' => false]);
+
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth = $date->copy()->endOfMonth();
         $days = $startOfMonth->diff($endOfMonth)->days + 1;
 
         $attendances = Attendance::with('breakTimes')
@@ -237,27 +279,80 @@ class AttendanceController extends Controller
                 $endOfMonth->format('Y-m-d')])
             ->get()
             ->map(function ($attendance) {
-                $attendance->date = $attendance->dateFormatConvert($attendance->date);
-                $attendance->start_time = $attendance->timeFormatConvert($attendance->start_time);
-                $attendance->end_time = $attendance->timeFormatConvert($attendance->end_time);
 
+                // ===================================================
+                // ＜重要＞
+                // 時間が登録されていない場合は計算せず、結果はnullとする
+                // ===================================================
+
+                // -------------------
+                // 表記変更
+                // -------------------
+                $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
+                $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
+
+                // -------------------
+                // 滞在時間の計算
+                // -------------------
+                $startTime = $attendance->start_time === null ? null : Carbon::createFromFormat('H:i', $attendance->start_time);
+                $endTime = $attendance->end_time === null ? null : Carbon::createFromFormat('H:i', $attendance->end_time);
+                $timeInOffice = ($startTime === null || $endTime === null) ? null : $startTime->diffInMinutes($endTime);
+
+                // -------------------
+                // 休憩時間の計算
+                // -------------------
                 $totalBreakTime = 0;
                 $breakTimes = $attendance->breakTimes;
 
-                // この値が空
-                dd($breakTimes);
-
-                foreach ($breakTimes as $breakTime) {
-                    $startTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->start_time));
-                    $endTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->end_time));
-                    $totalBreakTime += $startTime->diffInMinutes($endTime);
+                // 休憩時間の登録がある場合のみ計算
+                if (!$breakTimes->isEmpty()) {
+                    foreach ($breakTimes as $breakTime) {
+                        $startTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->start_time));
+                        $endTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->end_time));
+                        $totalBreakTime += $startTime->diffInMinutes($endTime);
+                    }
                 }
 
-                $attendance->total_break_time = $totalBreakTime;
+                // -------------------
+                // 勤務時間の計算
+                // -------------------
+                // 出勤時間・退勤時間のいずれかが登録されていない場合はnull
+                $totalWorkTime = $timeInOffice === null ? null : $timeInOffice - $totalBreakTime;
+
+                // -------------------
+                // 表記変更
+                // formatメソッドが使えない
+                // -------------------
+                // minutesFormatConvertメソッドは引数がnullの場合はnullを返す
+                $attendance->total_break_time = $this->minutesFormatConvert($totalBreakTime);
+                $attendance->total_work_time = $this->minutesFormatConvert($totalWorkTime);
 
                 return $attendance;
             });
 
+        // データがある場合のみデータを埋める
+        if ($attendances->count() !== 0) {
+            // 連想配列のキーをdateに変更
+            $attendances = $attendances->keyBy('date');
+
+            $keyDate = $startOfMonth->copy();
+            for ($i = 0; $i < $days; $i++) {
+                if (!isset($attendances[$keyDate->format('Y-m-d')])) {
+                    $attendances->put($keyDate->format('Y-m-d'), null);
+                }
+                $keyDate->addDay();
+            }
+        }
+
+        $data = [
+            'attendances' => $attendances,
+            'date' => $date,
+            'days' => $days,
+            'prevDate' => $date->copy()->subMonth(),
+            'nextDate' => $date->copy()->addMonth(),
+        ];
+
+        return view('attendance_list', $data);
     }
 
     // 勤怠詳細の表示
@@ -267,6 +362,12 @@ class AttendanceController extends Controller
     // 勤怠一覧の表示
     // 勤怠詳細の表示
     // スタッフ別勤怠一覧の表示
+
+    public function create($date)
+    {
+        // return view('attendance_register');
+        return '<p>OK</p>';
+    }
 
     // 申請用の画面表示
     public function show($id)
@@ -283,7 +384,7 @@ class AttendanceController extends Controller
 
             // 勤怠情報の取得
             $attendance = Attendance::with('user')->find($id);
-            $attendance->date = $attendance->dateFormatConvert($attendance->date);
+            $attendance->date = $this->toJapaneseDate($attendance->date);
             $attendance->start_time = $attendance->timeFormatConvert($attendance->start_time);
             $attendance->end_time = $attendance->timeFormatConvert($attendance->end_time);
             $attendance->break_start_time = $attendance->timeFormatConvert($attendance->break_start_time);

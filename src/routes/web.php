@@ -66,7 +66,7 @@ Route::middleware('header')->group(function () {
             ->name('attendance.end-work');
         Route::post('/attendance/startbreak', [AttendanceController::class, 'startBreakApi'])
             ->name('attendance.start-break');
-        Route::post('/attendance/end-break', [AttendanceController::class, 'endBreakApi'])
+        Route::post('/attendance/endbreak', [AttendanceController::class, 'endBreakApi'])
             ->name('attendance.end-break');
         Route::get('/attendance/list/{year}/{month}', [AttendanceController::class, 'showList'])
             ->whereNumber('year')       // {year}は数字のみ許可
@@ -75,6 +75,8 @@ Route::middleware('header')->group(function () {
         Route::get('/attendance/{id}', [AttendanceController::class, 'show'])
             ->whereNumber('id')         // {id}は数字のみ許可
             ->name('attendance.show');
+        Route::get('/attendance/{date}', [AttendanceController::class, 'create'])
+            ->name('attendance.create');
         Route::get('/stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
             ->name('stamp_correction_request.list');
     });
