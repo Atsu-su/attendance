@@ -25,21 +25,23 @@ class StampCorrectionRequest extends FormRequest
 
     public function prepareForValidation()
     {
-        $this->merge([
-            'start_time' => $this->formatTime($this->start_time),
-            'end_time' => $this->formatTime($this->end_time),
-            'break_start_time' => $this->formatTime($this->break_start_time),
-            'break_end_time' => $this->formatTime($this->break_end_time)
-        ]);
-    }
+        $breakStartTimes = $this->input('break_start_time', []);
+        $breakEndTimes = $this->input('break_end_time', []);
 
-    private function formatTime($time)
-    {
-        // 時間が1桁で入力された場合、2桁に変換する
-        if (preg_match('/^(0?[0-9]|1[0-9]|2[0-3]):([0-5]?[0-9])$/', $time, $matches)) {
-            return sprintf('%02d:%02d', $matches[1], $matches[2]);
-        }
-        return $time;
+        $formattedStartTimes = array_map(function ($time) {
+            return $this->timeToTwoDigits($time);
+        }, $breakStartTimes);
+
+        $formattedEndTimes = array_map(function ($time) {
+            return $this->timeToTwoDigits($time);
+        }, $breakEndTimes);
+
+        $this->merge([
+            'start_time' => $this->timeToTwoDigits($this->start_time),
+            'end_time' => $this->timeToTwoDigits($this->end_time),
+            'break_start_time' => $formattedStartTimes,
+            'break_end_time' => $formattedEndTimes,
+        ]);
     }
 
     /**
@@ -50,10 +52,6 @@ class StampCorrectionRequest extends FormRequest
     public function rules()
     {
         return [
-            'date' => [
-                'required',
-                'date'
-            ],
             'start_time' => [
                 'required',
                 'date_format:H:i'
@@ -70,11 +68,11 @@ class StampCorrectionRequest extends FormRequest
                     }
                 },
             ],
-            'break_start_time' => [
+            'break_start_time.*' => [
                 'required',
                 'date_format:H:i',
                 function($attribute, $value, $fail) {
-                    if ($this->isValidTF($this->start_time) && $this->isValidTF($this->break_start_time)) {
+                    if ($this->isValidTF($this->start_time) && $this->isValidTF($value)) {
                         $rule = new BreakStartRule($this->start_time);
                         if (!$rule->passes($attribute, $value)) {
                             $fail($rule->message());
@@ -82,11 +80,11 @@ class StampCorrectionRequest extends FormRequest
                     }
                 },
             ],
-            'break_end_time' => [
+            'break_end_time.*' => [
                 'required',
                 'date_format:H:i',
                 function ($attribute, $value, $fail) {
-                    if ($this->isValidTF($this->end_time) && $this->isValidTF($this->break_end_time)) {
+                    if ($this->isValidTF($this->end_time) && $this->isValidTF($value)) {
                         $rule = new BreakEndRule($this->end_time);
                         if (!$rule->passes($attribute, $value)) {
                             $fail($rule->message());
@@ -94,8 +92,13 @@ class StampCorrectionRequest extends FormRequest
                     }
                 },
                 function ($attribute, $value, $fail) {
-                    if ($this->isValidTF($this->break_start_time) && $this->isValidTF($this->break_end_time)) {
-                        $rule = new BreakTimeRule($this->break_start_time);
+                    // 比較対象のbreak_start_timeが配列なのでindexを取得
+                    preg_match('/break_end_time\.(\d+)/', $attribute, $matches);
+                    $index = $matches[1];
+                    $breakStartTime = $this->break_start_time[$index];
+
+                    if ($this->isValidTF($breakStartTime) && $this->isValidTF($value)) {
+                        $rule = new BreakTimeRule($breakStartTime);
                         if (!$rule->passes($attribute, $value)) {
                             $fail($rule->message());
                         }
@@ -113,16 +116,14 @@ class StampCorrectionRequest extends FormRequest
     public function messages()
     {
         return [
-            'date.date' => '日付を入力してください',
-            'date.required' => '日付を入力してください',
             'start_time.required' => '出勤時間を入力してください',
             'start_time.date_format' => '出勤時間は24時間表記（00:00）で入力してください',
             'end_time.required' => '退勤時間を入力してください',
             'end_time.date_format' => '退勤時間は24時間表記（00:00）で入力してください',
-            'break_start_time.required' => '休憩開始時間を入力してください',
-            'break_start_time.date_format' => '休憩開始時間は24時間表記（00:00）で入力してください',
-            'break_end_time.required' => '休憩終了時間を入力してください',
-            'break_end_time.date_format' => '休憩終了時間は24時間表記（00:00）で入力してください',
+            'break_start_time.*.required' => '休憩開始時間を入力してください',
+            'break_start_time.*.date_format' => '休憩開始時間は24時間表記（00:00）で入力してください',
+            'break_end_time.*.required' => '休憩終了時間を入力してください',
+            'break_end_time.*.date_format' => '休憩終了時間は24時間表記（00:00）で入力してください',
             'remarks.required' => '備考を入力してください',
             'remarks.string' => '文字列で入力してください',
             'remarks.max' => '100文字以内で入力してください',

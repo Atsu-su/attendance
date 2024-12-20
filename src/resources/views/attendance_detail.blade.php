@@ -7,32 +7,42 @@
   <div id="attendance-detail" class="cmn-page">
     <div class="l-container-60">
       @if ($isApplicable == true)
+
+      {{-- 一時的に追加 --}}
+      <div>
+        @if ($errors->any())
+          @foreach ($errors->all() as $error)
+            <p class="c-error-message">{{ $error }}</p>
+          @endforeach
+        @endif
+      </div>
+      {{-- 一時的に追加 --}}
+
       <h1 class="c-title">勤怠詳細<span>（申請）</span></h1>
-        <form action="/detail" method="POST">
+        <form action="{{ route('attendance.store', $attendance->id) }}" method="POST">
           @csrf
           <table class="c-table-detail edit-table">
             <tr>
               <th>名前</th>
-              <td class="name">{{ $attendance->user->name }}</td>
+              <td class="name">{{ $attendance->user->family_name }}&ensp;{{ $attendance->user->given_name}}</td>
             </tr>
             <tr>
               <th>日付</th>
-              {{-- <td><input class="input-date" type="date" name="date" value="{{ $attendance->date }}"></td> --}}
               <td class="date">{{ $attendance->date }}</td>
             </tr>
             <tr>
               <th>出勤・退勤</th>
-              <td><input class="input-time" type="text" name="start_time" value="{{ $attendance->start_time }}"><span class="wave">～</span><input class="input-time" type="text" name="end_time" value="{{ $attendance->end_time }}"></td>
+              <td><input class="input-time" type="text" name="start_time" value="{{ $attendance->start_time }}" placeholder="09:00"><span class="wave">～</span><input class="input-time" type="text" name="end_time" value="{{ $attendance->end_time }}" placeholder="18:00"></td>
             </tr>
             @foreach($breakTimes as $breakTime)
             <tr>
               <th>休憩{{$loop->iteration == 1 ? '' : $loop->iteration}}</th>
-              <td><input class="input-time" type="text" name="break_start_time" value="{{ $breakTime->start_time }}"><span class="wave">～</span><input class="input-time" type="text" name="break_end_time" value="{{ $breakTime->end_time }}"></td>
+              <td><input class="input-time" type="text" name="break_start_time[]" value="{{ $breakTime->start_time }}" placeholder="12:00"><span class="wave">～</span><input class="input-time" type="text" name="break_end_time[]" value="{{ $breakTime->end_time }}" placeholder="13:00"></td>
             </tr>
             @endforeach
             <tr>
               <th>備考</th>
-              <td><textarea class="remarks-textarea" name="remarks"></textarea></td>
+              <td><textarea class="remarks-textarea" name="remarks" placeholder="申請理由を記載して下さい">{{ old('remarks') }}</textarea></td>
             </tr>
           </table>
           <button class="button c-btn c-btn--black c-btn--attendance-correction" type="submit">修正</button>
@@ -44,7 +54,7 @@
         <table class="c-table-detail request-content-table">
           <tr>
             <th>名前</th>
-            <td class="name">{{ $request->user->name }}</td>
+            <td class="name">{{ $request->user->family_name }}&ensp;{{ $request->user->given_name }}</td>
           </tr>
           <tr>
             <th>日付</th>

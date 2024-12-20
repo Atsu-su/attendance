@@ -128,9 +128,17 @@ select {
   font-size: 16px;
 }
 
+input::placeholder {
+  opacity: 0.6;
+}
+
 textarea {
   resize: vertical;
   display: block;
+}
+
+textarea::placeholder {
+  opacity: 0.6;
 }
 
 button {
@@ -363,6 +371,11 @@ a:hover {
   height: 59px;
   font-size: 20px;
   border: 1px solid var(--color-border-gray)
+}
+
+.c-default-form .form-input-name {
+  display: flex;
+  gap: 20px;
 }
 
 .c-default-form .form-btn {
@@ -731,7 +744,7 @@ a:hover {
 .c-table-detail .remarks-textarea {
   margin: 18px 0;
   padding-left: 8px;
-  padding-top: 3px;
+  padding-top: 5px;
   width: 316px;
   height: 90px;
   border: 1px solid var(--color-border-light-gray);
@@ -941,7 +954,7 @@ body {
 }
 
 #attendance-register .label {
-  margin: 80px auto 0;
+  margin: 60px auto 0;
 }
 
 #attendance-register .date {
@@ -950,13 +963,32 @@ body {
 }
 
 #attendance-register .time {
-  margin-top: 40px;
+  margin-top: 20px;
   font-size: 5rem;
   font-weight: 700;
 }
 
 #attendance-register .time--opacity {
-  opacity: 0.5;
+  opacity: 0.3;
+}
+
+#attendance-register .reload {
+  margin: 18px auto 0;
+  width: 200px;
+  display: block;
+  position: relative;
+  color: var(--color-font-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+#attendance-register .reload::before {
+  content: '';
+  width: 173px;
+  position: absolute;
+  top: calc(100% + 4px);
+  border-bottom: 1px solid var(--color-font-blue);
 }
 
 #attendance-register .buttons {

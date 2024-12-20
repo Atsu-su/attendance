@@ -10,6 +10,7 @@
     <p id="time" class="time{{ $attendance->status == \App\Models\Attendance::OFF_DUTY ? ' time--opacity' : ''}}">
       {{ $attendance->status == \App\Models\Attendance::OFF_DUTY ? $attendance->timeFormatConvert($attendance->end_time) : $now->format('H:i') }}
     </p>
+    <a class="reload" href="{{ route('attendance.register') }}">時間を更新する</a>
     <div id="buttons" class="buttons">
       <button id="on-duty-button" class="c-btn c-btn--black c-btn--attendance-register {{ $attendance->status == \App\Models\Attendance::BF_WORK ? '' : 'js-hidden' }}">出勤</button>
       <div id="leave-buttons" class="buttons-leave {{ $attendance->status == \App\Models\Attendance::ON_DUTY ? '' : 'js-hidden' }}">

@@ -34,14 +34,21 @@ class AttendanceController extends Controller
     }
 
     /**
-     * 日付を日本語フォーマットへ変換
-     * @param string $date
-     * @return string
-     * 例）2024-01-01 → 2024年01月01日
+     * 勤怠情報の所有者かどうかを確認
+     * @param $id
+     * @return Illuminate\Http\Response
+     * @return bool
+     * $id: attendancesテーブルのid
      */
-    public function toJapaneseDate($date)
+    public function checkAttendanceOwner($id)
     {
-        return Carbon::parse($date)->isoFormat('YYYY年MM月DD日');
+        $attendance = Attendance::where('id', $id)->first();
+        if (!$attendance) {
+            return abort(404);
+        } else if ($attendance->user_id !== auth()->id()) {
+            return abort(403);
+        }
+        return true;
     }
 
     // ----------------------------------
@@ -330,11 +337,17 @@ class AttendanceController extends Controller
                 return $attendance;
             });
 
+        // ----------------------------------
+        //
+        // データ整形
+        //
+        // ----------------------------------
         // データがある場合のみデータを埋める
         if ($attendances->count() !== 0) {
             // 連想配列のキーをdateに変更
             $attendances = $attendances->keyBy('date');
 
+            // $keyDateは対象月の1日（11月1日など）
             $keyDate = $startOfMonth->copy();
             for ($i = 0; $i < $days; $i++) {
                 if (!isset($attendances[$keyDate->format('Y-m-d')])) {
@@ -363,15 +376,27 @@ class AttendanceController extends Controller
     // 勤怠詳細の表示
     // スタッフ別勤怠一覧の表示
 
+    /**
+     * 勤怠申請の作成
+     * 勤怠情報未登録日の勤怠情報を登録する
+     * @param int $date
+     */
     public function create($date)
     {
         // return view('attendance_register');
         return '<p>OK</p>';
     }
 
-    // 申請用の画面表示
+    /**
+     * 申請画面表示
+     * @param int $id
+     * $id: attendancesテーブルのid
+     */
     public function show($id)
     {
+        // 勤怠情報の所有者か確認
+        $this->checkAttendanceOwner($id);
+
         // 申請は複数回可能なため最後の申請を取得
         $request = ModelsStampCorrectionRequest::with('requestBreakTimes')
             ->where('attendance_id', $id)
@@ -384,22 +409,21 @@ class AttendanceController extends Controller
 
             // 勤怠情報の取得
             $attendance = Attendance::with('user')->find($id);
-            $attendance->date = $this->toJapaneseDate($attendance->date);
-            $attendance->start_time = $attendance->timeFormatConvert($attendance->start_time);
-            $attendance->end_time = $attendance->timeFormatConvert($attendance->end_time);
-            $attendance->break_start_time = $attendance->timeFormatConvert($attendance->break_start_time);
-            $attendance->break_end_time = $attendance->timeFormatConvert($attendance->break_end_time);
+            $attendance->date = $attendance->toJapaneseDate($attendance->date);
+            $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
+            $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
 
             // 休憩時間の取得
             $breakTimes = BreakTime::where('attendance_id', $attendance->id)
                 ->get()
                 ->map(function ($breakTime) {
                     $breakTime->start_time = $breakTime->timeFormatConvert($breakTime->start_time);
-                    $breakTime->end_time = $breakTime->timeFormatConvert($breakTime->end_time);
+                    $breakTime->end_time = $breakTime->end_time === null ? null : $breakTime->timeFormatConvert($breakTime->end_time);
                     return $breakTime;
                 });
 
-            return view('attendance_detail', compact('attendance', 'breakTimes', 'isApplicable'));
+            return view('attendance_detail', compact('isApplicable', 'attendance', 'breakTimes'));
+
         } else {
             $isApplicable = false;
 
@@ -417,14 +441,38 @@ class AttendanceController extends Controller
 
             return view('attendance_detail', compact('request', 'requestBreakTimes', 'isApplicable'));
         }
-
-
-
-
     }
 
-    public function store(StampCorrectionRequest $request)
+    public function store(StampCorrectionRequest $request, $id)
     {
+        dd($request->all());
+
+        $user = auth()->user();
+
+        // 勤怠情報の所有者か確認
+        $this->checkAttendanceOwner($id);
+
+        // 申請情報の登録
+        ModelsStampCorrectionRequest::create([
+            'attendance_id' => $id,
+            'user_id' => $user->id,
+            'is_approved' => false,
+            'request_date' => now()->format('Y-m-d'),
+            'start_time' => $request->input('start_time'),
+            'end_time' => $request->input('end_time'),
+            'remarks' => $request->input('remarks'),
+        ]);
+
+        // 休憩時間の登録
+        foreach ($request->input('break_start_time') as $key => $breakStartTime) {
+            $breakEndTime = $request->input('break_end_time')[$key];
+            BreakTime::create([
+                'attendance_id' => $id,
+                'start_time' => $breakStartTime,
+                'end_time' => $breakEndTime,
+            ]);
+        }
+
         // return redirect()->route('attendance.edit', ['id' => $attendance->id]);
     }
 }

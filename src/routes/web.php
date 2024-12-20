@@ -75,6 +75,9 @@ Route::middleware('header')->group(function () {
         Route::get('/attendance/{id}', [AttendanceController::class, 'show'])
             ->whereNumber('id')         // {id}は数字のみ許可
             ->name('attendance.show');
+        Route::post('/attendance/{id}', [AttendanceController::class, 'store'])
+            ->whereNumber('id')         // {id}は数字のみ許可
+            ->name('attendance.store');
         Route::get('/attendance/{date}', [AttendanceController::class, 'create'])
             ->name('attendance.create');
         Route::get('/stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
