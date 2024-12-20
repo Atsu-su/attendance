@@ -11,6 +11,20 @@ class Attendance extends Model
     use HasFactory;
     use DateTimeFormatTrait;
 
+    /*
+    public const BF_WORK = ['bf_work' => '勤務外'];
+
+    public static function getBfWorkKey()
+    {
+        return array_key_first(self::BF_WORK);
+    }
+
+    public static function getBfWorkValue()
+    {
+        return self::BF_WORK[self::getBfWorkKey()];
+    }
+    */
+
     public const BF_WORK = 'bf_work';
     public const ON_DUTY = 'on_duty';
     public const BREAK = 'break';

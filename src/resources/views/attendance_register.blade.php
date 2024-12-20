@@ -15,13 +15,27 @@
       <button id="on-duty-button" class="c-btn c-btn--black c-btn--attendance-register {{ $attendance->status == \App\Models\Attendance::BF_WORK ? '' : 'js-hidden' }}">出勤</button>
       <div id="leave-buttons" class="buttons-leave {{ $attendance->status == \App\Models\Attendance::ON_DUTY ? '' : 'js-hidden' }}">
         <button id="off-duty-button" class="c-btn c-btn--black c-btn--attendance-register">退勤</button>
-        <button id="break-start-button" class="c-btn c-btn--white c-btn--attendance-register">休憩入</button>
+        <button id="break-start-button" class="c-btn c-btn--white c-btn--attendance-register">休憩</button>
       </div>
-      <button id="break-end-button" class="c-btn c-btn--white c-btn--attendance-register buttons-back-to-work {{ $attendance->status == \App\Models\Attendance::BREAK ? '' : 'js-hidden' }}">休憩終</button>
+      <button id="break-end-button" class="c-btn c-btn--white c-btn--attendance-register buttons-back-to-work {{ $attendance->status == \App\Models\Attendance::BREAK ? '' : 'js-hidden' }}">休憩戻</button>
     </div>
     <p id="message" class="message {{ $attendance->status == \App\Models\Attendance::OFF_DUTY ? '' : 'js-hidden' }}">退勤しました。お疲れ様でした！</p>
   </div>
   <script>
+    /*
+    const attendanceStatus = {{ $attendance->status }};
+    // または文字列の場合
+    const attendanceStatus = "{{ $attendance->status }}";
+
+    または
+
+    const attendance = @json([
+        'status' => $attendance->status,
+        'ON_DUTY' => App\Models\Attendance::ON_DUTY
+    ]);
+    */
+
+
     /* ------------------ */
     /* 関数
     /* ------------------ */
@@ -86,7 +100,7 @@
       const status = await getResponseJson(urlStartWork, csrf);
 
       if (status) {
-        label.textContent = '勤務中';
+        label.textContent = '出勤中';
         toggleClass(onDutyButton); // 非表示
         toggleClass(leaveButtons); // 表示
       } else {
