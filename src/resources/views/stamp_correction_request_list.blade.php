@@ -26,11 +26,11 @@
               @if ($request->is_approved == 0)
                 <tr class="data">
                   <td>{{ $request->approval_status }}</td>
-                  <td>{{ $request->user->name }}</td>
-                  <td>{{ $request->date }}</td>
+                  <td>{{ $request->user->family_name }}&ensp;{{ $request->user->given_name }}</td>
+                  <td>{{ $request->attendance->date }}</td>
                   <td>{{ $request->remarks }}</td>
                   <td>{{ $request->request_date}}</td>
-                  <td><a href="{{ route('attendance.edit', $request->id) }}">詳細</a></td>
+                  <td><a href="{{ route('attendance.show', $request->attendance_id) }}">詳細</a></td>
                 </tr>
               @endif
             @endforeach
@@ -50,11 +50,11 @@
               @if ($request->is_approved == 1)
                 <tr class="data">
                   <td>{{ $request->approval_status }}</td>
-                  <td>{{ $request->user->name }}</td>
-                  <td>{{ $request->date }}</td>
+                  <td>{{ $request->user->family_name }}&ensp;{{ $request->user->given_name }}</td>
+                  <td>{{ $request->attendance->date }}</td>
                   <td>{{ $request->remarks }}</td>
                   <td>{{ $request->request_date}}</td>
-                  <td><a href="{{ route('attendance.edit', $request->id) }}">詳細</a></td>
+                  <td><a href="{{ route('attendance.show', $request->attendance_id) }}">詳細</a></td>
                 </tr>
               @endif
             @endforeach

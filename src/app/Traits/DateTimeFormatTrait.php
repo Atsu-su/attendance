@@ -10,6 +10,7 @@ trait DateTimeFormatTrait
      * 入力された時間が正しい形式かどうかを判定
      * @param string $time
      * @return boolean
+     * 例）09:00（それぞれ2桁） → true
      */
     public function isValidTF($time) //TF = TimeFormat
     {
@@ -58,6 +59,12 @@ trait DateTimeFormatTrait
         return Carbon::parse($date)->isoFormat('YYYY年MM月DD日');
     }
 
+    /**
+     * 1桁の時間を2桁へ変換
+     * @param string $time
+     * @return string
+     * 例）9:9 → 09:09
+     */
     public function timeToTwoDigits($time)
     {
         // 時間が1桁で入力された場合、2桁に変換する

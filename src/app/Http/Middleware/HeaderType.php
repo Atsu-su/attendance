@@ -16,8 +16,14 @@ class HeaderType
      */
     public function handle(Request $request, Closure $next)
     {
+        $year = date('Y');
+        $month = date('m');
         $headerType = $this->determineHeaderType($request);
-        $request->merge(['headerType' => $headerType]);
+        $request->merge([
+            'year' => $year,
+            'month' => $month,
+            'headerType' => $headerType
+        ]);
         return $next($request);
     }
 

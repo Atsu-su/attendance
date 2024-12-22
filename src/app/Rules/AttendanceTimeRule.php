@@ -29,10 +29,10 @@ class AttendanceTimeRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        // 勤務開始時間＜勤務終了時間ならtrue
+        // 勤務開始時間＜＝勤務終了時間ならtrue
         $start = Carbon::createFromFormat('H:i', $this->startTime);
         $end = Carbon::createFromFormat('H:i', $value);
-        return $start->lessThan($end);
+        return $start->lessThanOrEqualTo($end);
     }
 
     /**

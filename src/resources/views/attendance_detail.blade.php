@@ -34,12 +34,19 @@
               <th>出勤・退勤</th>
               <td><input class="input-time" type="text" name="start_time" value="{{ $attendance->start_time }}" placeholder="09:00"><span class="wave">～</span><input class="input-time" type="text" name="end_time" value="{{ $attendance->end_time }}" placeholder="18:00"></td>
             </tr>
-            @foreach($breakTimes as $breakTime)
-            <tr>
-              <th>休憩{{$loop->iteration == 1 ? '' : $loop->iteration}}</th>
-              <td><input class="input-time" type="text" name="break_start_time[]" value="{{ $breakTime->start_time }}" placeholder="12:00"><span class="wave">～</span><input class="input-time" type="text" name="break_end_time[]" value="{{ $breakTime->end_time }}" placeholder="13:00"></td>
-            </tr>
-            @endforeach
+            @if ($breakTimes->isEmpty())
+              <tr>
+                <th>休憩</th>
+                <td><input class="input-time" type="text" name="break_start_time[]" placeholder="12:00"><span class="wave">～</span><input class="input-time" type="text" name="break_end_time[]" placeholder="13:00"></td>
+              </tr>
+            @else
+              @foreach($breakTimes as $breakTime)
+              <tr>
+                <th>休憩{{$loop->iteration == 1 ? '' : $loop->iteration}}</th>
+                <td><input class="input-time" type="text" name="break_start_time[]" value="{{ $breakTime->start_time }}" placeholder="12:00"><span class="wave">～</span><input class="input-time" type="text" name="break_end_time[]" value="{{ $breakTime->end_time }}" placeholder="13:00"></td>
+              </tr>
+              @endforeach
+            @endif
             <tr>
               <th>備考</th>
               <td><textarea class="remarks-textarea" name="remarks" placeholder="申請理由を記載して下さい">{{ old('remarks') }}</textarea></td>

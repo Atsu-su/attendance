@@ -40,12 +40,12 @@ class AttendanceController extends Controller
      * @return bool
      * $id: attendancesテーブルのid
      */
-    public function checkAttendanceOwner($id)
+    public function checkAttendanceOwner($id, $user)
     {
         $attendance = Attendance::where('id', $id)->first();
         if (!$attendance) {
             return abort(404);
-        } else if ($attendance->user_id !== auth()->id()) {
+        } else if ($attendance->user_id !== $user->id) {
             return abort(403);
         }
         return true;
@@ -53,7 +53,7 @@ class AttendanceController extends Controller
 
     // ----------------------------------
     // テスト用の日付
-    const DAY = 1;
+    const DAY = 6;
     private $now;
 
     public function __construct()
@@ -87,7 +87,7 @@ class AttendanceController extends Controller
                 $attendance = Attendance::create([
                     'user_id' => $user->id,
                     'date' => $now->format('Y-m-d'),
-                    'status' => Attendance::BF_WORK
+                    'status' => Attendance::BF_WORK[0]
                 ]);
             } catch (Exception $e) {
 
@@ -123,7 +123,7 @@ class AttendanceController extends Controller
             Attendance::where('user_id', $user->id)
                 ->where('date', $date)
                 ->update([
-                    'status' => Attendance::ON_DUTY,
+                    'status' => Attendance::ON_DUTY[0],
                     'start_time' => $time,
                 ]);
 
@@ -155,7 +155,7 @@ class AttendanceController extends Controller
             Attendance::where('user_id', $user->id)
                 ->where('date', $date)
                 ->update([
-                    'status' => Attendance::OFF_DUTY,
+                    'status' => Attendance::OFF_DUTY[0],
                     'end_time' => $time,
                 ]);
 
@@ -184,7 +184,7 @@ class AttendanceController extends Controller
 
         $attendance = Attendance::where('user_id', $user->id)
             ->where('date', $date)
-            ->where('status', Attendance::ON_DUTY)
+            ->where('status', Attendance::ON_DUTY[0])
             ->first();
 
         if (!$attendance) {
@@ -200,7 +200,7 @@ class AttendanceController extends Controller
             ]);
 
             $attendance->update([
-                'status' => Attendance::BREAK
+                'status' => Attendance::BREAK[0]
             ]);
 
         // レスポンスの返却（json）
@@ -228,7 +228,7 @@ class AttendanceController extends Controller
 
         $attendance = Attendance::where('user_id', $user->id)
             ->where('date', $date)
-            ->where('status', Attendance::BREAK)
+            ->where('status', Attendance::BREAK[0])
             ->first();
 
         if (!$attendance) {
@@ -246,7 +246,7 @@ class AttendanceController extends Controller
                 ]);
 
             $attendance->update([
-                'status' => Attendance::ON_DUTY
+                'status' => Attendance::ON_DUTY[0]
             ]);
 
         // レスポンスの返却（json）
@@ -368,14 +368,6 @@ class AttendanceController extends Controller
         return view('attendance_list', $data);
     }
 
-    // 勤怠詳細の表示
-
-    // 管理者編
-    //
-    // 勤怠一覧の表示
-    // 勤怠詳細の表示
-    // スタッフ別勤怠一覧の表示
-
     /**
      * 勤怠申請の作成
      * 勤怠情報未登録日の勤怠情報を登録する
@@ -395,7 +387,8 @@ class AttendanceController extends Controller
     public function show($id)
     {
         // 勤怠情報の所有者か確認
-        $this->checkAttendanceOwner($id);
+        $user = auth()->user();
+        $this->checkAttendanceOwner($id, $user);
 
         // 申請は複数回可能なため最後の申請を取得
         $request = ModelsStampCorrectionRequest::with('requestBreakTimes')
@@ -445,12 +438,11 @@ class AttendanceController extends Controller
 
     public function store(StampCorrectionRequest $request, $id)
     {
-        dd($request->all());
-
         $user = auth()->user();
 
         // 勤怠情報の所有者か確認
-        $this->checkAttendanceOwner($id);
+        $user = auth()->user();
+        $this->checkAttendanceOwner($id, $user);
 
         // 申請情報の登録
         ModelsStampCorrectionRequest::create([
@@ -464,8 +456,10 @@ class AttendanceController extends Controller
         ]);
 
         // 休憩時間の登録
-        foreach ($request->input('break_start_time') as $key => $breakStartTime) {
-            $breakEndTime = $request->input('break_end_time')[$key];
+        $breakStartTime = $request->input('break_start_time');
+        $breakEndTime = $request->input('break_end_time');
+        foreach ($breakStartTime as $key => $breakStartTime) {
+            $breakEndTime = $breakEndTime[$key];
             BreakTime::create([
                 'attendance_id' => $id,
                 'start_time' => $breakStartTime,
@@ -473,6 +467,12 @@ class AttendanceController extends Controller
             ]);
         }
 
-        // return redirect()->route('attendance.edit', ['id' => $attendance->id]);
+        return redirect()->route('stamp_correction_request.list');
     }
 }
+
+    // 管理者編
+    //
+    // 勤怠一覧の表示
+    // 勤怠詳細の表示
+    // スタッフ別勤怠一覧の表示

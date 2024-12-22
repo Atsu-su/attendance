@@ -11,24 +11,10 @@ class Attendance extends Model
     use HasFactory;
     use DateTimeFormatTrait;
 
-    /*
-    public const BF_WORK = ['bf_work' => '勤務外'];
-
-    public static function getBfWorkKey()
-    {
-        return array_key_first(self::BF_WORK);
-    }
-
-    public static function getBfWorkValue()
-    {
-        return self::BF_WORK[self::getBfWorkKey()];
-    }
-    */
-
-    public const BF_WORK = 'bf_work';
-    public const ON_DUTY = 'on_duty';
-    public const BREAK = 'break';
-    public const OFF_DUTY = 'off_duty';
+    public const BF_WORK = ['bf_work', '勤務外'];
+    public const ON_DUTY = ['on_duty', '勤務中'];
+    public const BREAK = ['break', '休憩中'];
+    public const OFF_DUTY = ['off_duty', '退勤済'];
 
     protected $guarded = ['id'];
 
@@ -50,14 +36,14 @@ class Attendance extends Model
     public function getWorkStatusAttribute()
     {
         switch ($this->status) {
-            case self::BF_WORK:
-                return '勤務外';
-            case self::ON_DUTY:
-                return '勤務中';
-            case self::BREAK:
-                return '休憩中';
-            case self::OFF_DUTY:
-                return '退勤済';
+            case self::BF_WORK[0]:
+                return self::BF_WORK[1];
+            case self::ON_DUTY[0]:
+                return self::ON_DUTY[1];
+            case self::BREAK[0]:
+                return self::BREAK[1];
+            case self::OFF_DUTY[0]:
+                return self::OFF_DUTY[1];
             default:
                 return '不明';
         }

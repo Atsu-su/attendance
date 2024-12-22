@@ -29,7 +29,7 @@ class BreakEndRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        // 休憩終了時間＜勤務終了時間ならtrue
+        // 休憩終了時間＜＝勤務終了時間ならtrue
         $end = Carbon::createFromFormat('H:i', $this->endTime);
         $breakEnd = Carbon::createFromFormat('H:i', $value);
         return $breakEnd->lessThanOrEqualTo($end);
