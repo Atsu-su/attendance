@@ -53,7 +53,7 @@ class AttendanceController extends Controller
 
     // ----------------------------------
     // テスト用の日付
-    const DAY = 6;
+    const DAY = 0;
     private $now;
 
     public function __construct()
@@ -67,7 +67,9 @@ class AttendanceController extends Controller
         return redirect()->route('login');
     }
 
-    // 勤怠登録トップ画面
+    /**
+     * 勤怠登録トップ画面表示
+     */
     public function register()
     {
         $user = auth()->user();
@@ -104,7 +106,9 @@ class AttendanceController extends Controller
         return view('attendance_register', compact('now', 'attendance'));
     }
 
-    // 出勤のAPI
+    /**
+     * 出勤登録のAPI
+     */
     public function startWorkApi()
     {
         $user = auth()->user();
@@ -136,7 +140,9 @@ class AttendanceController extends Controller
         }
     }
 
-    // 退勤のAPI
+    /**
+     * 退勤登録のAPI
+     */
     public function endWorkApi()
     {
         $user = auth()->user();
@@ -168,7 +174,9 @@ class AttendanceController extends Controller
         }
     }
 
-    // 休憩開始のAPI
+    /**
+     * 休憩開始登録のAPI
+     */
     public function startBreakApi()
     {
         $user = auth()->user();
@@ -212,7 +220,9 @@ class AttendanceController extends Controller
         }
     }
 
-    // 休憩終了のAPI
+    /**
+     * 休憩終了登録のAPI
+     */
     public function endBreakApi()
     {
         $user = auth()->user();
@@ -375,7 +385,17 @@ class AttendanceController extends Controller
      */
     public function create($date)
     {
-        // return view('attendance_register');
+        $user = auth()->user();
+        $attendance = Attendance::where('user_id', $user->id)
+            ->where('date', $date)
+            ->first();
+
+        // 勤怠情報が存在していれば作成不可
+        if ($attendance) {
+            return redirect()->route('attendance.show', $attendance->id);
+        }
+
+        // return view('attendance_detail_create');
         return '<p>OK</p>';
     }
 
@@ -396,43 +416,57 @@ class AttendanceController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        // 申請が存在しないか、申請が承認されている場合に編集可能
-        if (!$request || $request->is_approved == 1) {
-            $isApplicable = true;
+        // （申請が存在しない OR 申請が承認されている）AND 対象の日付が前日以前
+        // の場合に編集可能
+        $attendance = Attendance::find($id);
+        if ($attendance->date <= now()->subDay()->format('Y-m-d')) {
 
-            // 勤怠情報の取得
-            $attendance = Attendance::with('user')->find($id);
-            $attendance->date = $attendance->toJapaneseDate($attendance->date);
-            $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
-            $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
+            $isApplicableForDate = true;
 
-            // 休憩時間の取得
-            $breakTimes = BreakTime::where('attendance_id', $attendance->id)
-                ->get()
-                ->map(function ($breakTime) {
-                    $breakTime->start_time = $breakTime->timeFormatConvert($breakTime->start_time);
-                    $breakTime->end_time = $breakTime->end_time === null ? null : $breakTime->timeFormatConvert($breakTime->end_time);
-                    return $breakTime;
-                });
+            if ((!$request || $request->is_approved == 1)) {
 
-            return view('attendance_detail', compact('isApplicable', 'attendance', 'breakTimes'));
+                $isApplicable = true;
 
+                // 勤怠情報の取得
+                $attendance = Attendance::with('user')->find($id);
+                $attendance->date = $attendance->toJapaneseDate($attendance->date);
+                $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
+                $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
+
+                // 休憩時間の取得
+                $breakTimes = BreakTime::where('attendance_id', $attendance->id)
+                    ->get()
+                    ->map(function ($breakTime) {
+                        $breakTime->start_time = $breakTime->timeFormatConvert($breakTime->start_time);
+                        $breakTime->end_time = $breakTime->end_time === null ? null : $breakTime->timeFormatConvert($breakTime->end_time);
+                        return $breakTime;
+                    });
+
+                return view('attendance_detail', compact('isApplicableForDate', 'isApplicable', 'attendance', 'breakTimes'));
+
+            } else {
+
+                $isApplicable = false;
+
+                $request->date = $request->dateFormatConvert($request->attendance->date);
+                $request->start_time = $request->timeFormatConvert($request->start_time);
+                $request->end_time = $request->timeFormatConvert($request->end_time);
+
+                $requestBreakTimes = $request
+                    ->requestBreakTimes
+                    ->map(function ($requestBreakTime) {
+                        $requestBreakTime->start_time = $requestBreakTime->timeFormatConvert($requestBreakTime->start_time);
+                        $requestBreakTime->end_time = $requestBreakTime->timeFormatConvert($requestBreakTime->end_time);
+                        return $requestBreakTime;
+                    });
+
+                return view('attendance_detail', compact('isApplicableForDate', 'isApplicable', 'request', 'requestBreakTimes'));
+            }
         } else {
-            $isApplicable = false;
 
-            $request->date = $request->dateFormatConvert($request->attendance->date);
-            $request->start_time = $request->timeFormatConvert($request->start_time);
-            $request->end_time = $request->timeFormatConvert($request->end_time);
+            $isApplicableForDate = false;
 
-            $requestBreakTimes = $request
-                ->requestBreakTimes
-                ->map(function ($requestBreakTime) {
-                    $requestBreakTime->start_time = $requestBreakTime->timeFormatConvert($requestBreakTime->start_time);
-                    $requestBreakTime->end_time = $requestBreakTime->timeFormatConvert($requestBreakTime->end_time);
-                    return $requestBreakTime;
-                });
-
-            return view('attendance_detail', compact('request', 'requestBreakTimes', 'isApplicable'));
+            return view('attendance_detail', compact('isApplicableForDate'));
         }
     }
 

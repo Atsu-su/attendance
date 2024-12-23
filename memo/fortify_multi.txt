@@ -128,6 +128,22 @@ Route::prefix('admin')->group(function () {
 });
 
 // -------------------------------------------------------------------
+routes/web.php
+
+use Laravel\Fortify\Features;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+
+// admin用のルートグループ
+Route::prefix('admin')->group(function () {
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+        ->middleware(['guest:admin'])
+        ->name('admin.login');
+
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware(['guest:admin']);
+});
+
+// -------------------------------------------------------------------
 
 Laravelで管理者(Admin)とユーザー(User)の2つの認証システムを実装する方法を説明します。
 Laravel Fortify Multi-auth ImplementationClick to open code

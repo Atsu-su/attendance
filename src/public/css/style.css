@@ -400,6 +400,14 @@ a:hover {
   line-height: 1;
 }
 
+.c-table-error-message {
+  margin-top: 8px;
+  color: var(--color-font-red);
+  font-size: 0.8rem;
+  font-weight: normal;
+  line-height: 1;
+}
+
 /* ---------------------- */
 /* DB処理完了メッセージ用モーダル
 /* ---------------------- */
@@ -682,6 +690,7 @@ a:hover {
 /* 詳細テーブル
 /* ---------------------- */
 .c-table-detail {
+  padding-bottom: 18px;
   color: var(--color-font-light-gray);
   font-weight: 700;
   background-color: var(--color-bg-white);
@@ -742,7 +751,7 @@ a:hover {
 }
 
 .c-table-detail .remarks-textarea {
-  margin: 18px 0;
+  margin: 18px 0 0;
   padding-left: 8px;
   padding-top: 5px;
   width: 316px;
@@ -755,6 +764,14 @@ a:hover {
   width: 350px;
   line-height: 1.8;
 }
+
+/* エラーメッセージ対応（上書き） */
+/* .c-table-detail tr:has(+ .error) th {
+  padding-bottom: 0;
+  border-bottom: none;
+} */
+
+
 
 /* ---------------------- */
 /* <pre>への対応
@@ -1172,6 +1189,12 @@ body {
   margin: 10px 0 43px;
   color: var(--color-font-red);
   text-align: right;
+}
+
+#attendance-detail .not-applicable-message {
+  margin-top: 60px;
+  font-size: 1.5rem;
+  text-align: center;
 }
 
 /* ----------------------- */
