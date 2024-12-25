@@ -158,11 +158,16 @@ return [
     ],
 
     'redirects' => [
-        'login' => RouteServiceProvider::HOME,
-        'logout' => RouteServiceProvider::HOME,
-        'register' => function() {
-            return route('profile.edit');
-        },
-    ]
-
+        'user' => [
+            'login' => RouteServiceProvider::HOME,
+            'logout' => RouteServiceProvider::HOME,
+            'register' => function() {
+                return route('profile.edit');
+            },
+        ],
+        'admin' => [
+            'login' => RouteServiceProvider::ADMIN_HOME,
+            'logout' => RouteServiceProvider::ADMIN_HOME,
+        ],
+    ],
 ];

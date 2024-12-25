@@ -13,7 +13,7 @@
 
       <a class="nav-link" href="{{ route('attendance.register') }}">勤怠</a>
       <a class="nav-link" href="{{ route('attendance.show-list', ['year' => request()->year, 'month' => request()->month]) }}">勤怠一覧</a>
-      <a class="nav-link" href="{{ route('stamp_correction_request.list') }}">申請</a>
+      <a class="nav-link" href="{{ route('stamp-correction-request.list') }}">申請</a>
       @if (request()->headerType == 'logOut')
         <form action="{{ route('logout') }}" method="post">
           @csrf

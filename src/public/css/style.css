@@ -715,14 +715,10 @@ a:hover {
   border-bottom: 2px solid var(--color-border-light-gray);
 }
 
-.c-table-detail .name {
-  padding-left: 24px;
-}
-
-.c-table-detail .date {
-  padding-left: 24px;
-}
-
+.c-table-detail .request-id,
+.c-table-detail .request-date,
+.c-table-detail .name,
+.c-table-detail .date,
 .c-table-detail .time {
   padding-left: 24px;
 }

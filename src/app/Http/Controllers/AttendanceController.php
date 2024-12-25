@@ -34,12 +34,26 @@ class AttendanceController extends Controller
     }
 
     /**
+     * abortするかを判定
+     * @param $callback, $code
+     * @return Illuminate\Http\Response
+     * $id: attendancesテーブルのid
+     */
+    public function abort($callback, $code)
+    {
+        if ($callback()) {
+            return abort($code);
+        }
+    }
+
+    /**
      * 勤怠情報の所有者かどうかを確認
      * @param $id
      * @return Illuminate\Http\Response
      * @return bool
      * $id: attendancesテーブルのid
      */
+
     public function checkAttendanceOwner($id, $user)
     {
         $attendance = Attendance::where('id', $id)->first();
@@ -276,6 +290,14 @@ class AttendanceController extends Controller
     {
         $user = auth()->user();
 
+        // 与えられた月が未来の場合はabort403
+        $this->abort(function () use ($year, $month) {
+            if (Carbon::create($year, $month)->isFuture()) {
+                return true;    // abort(403)
+            }
+            return false;
+        }, 404);
+
         // ----------------------------------
         //
         // 日付・時間の取得
@@ -501,7 +523,7 @@ class AttendanceController extends Controller
             ]);
         }
 
-        return redirect()->route('stamp_correction_request.list');
+        return redirect()->route('stamp-correction-request.list');
     }
 }
 

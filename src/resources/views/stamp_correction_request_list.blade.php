@@ -54,7 +54,7 @@
                   <td>{{ $request->attendance->date }}</td>
                   <td>{{ $request->remarks }}</td>
                   <td>{{ $request->request_date}}</td>
-                  <td><a href="{{ route('attendance.show', $request->attendance_id) }}">詳細</a></td>
+                  <td><a href="{{ route('stamp-correction-request.show', $request->id) }}">詳細</a></td>
                 </tr>
               @endif
             @endforeach
