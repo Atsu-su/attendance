@@ -35,23 +35,6 @@ Route::get('/verify', function(){
 
 // ヘッダーのミドルウェア
 Route::middleware('header')->group(function () {
-
-    Route::get('/list', function() {
-        return view('attendance_list');
-    });
-
-    Route::get('/detail', function() {
-        return view('attendance_detail');
-    });
-
-    Route::get('/admin/detail', function(){
-        return view('attendance_detail');
-    });
-
-    Route::get('/admin/staff', function(){
-        return view('staff_list');
-    });
-
     // --------------------------------------------------------
 
     // indexの設定
@@ -60,8 +43,12 @@ Route::middleware('header')->group(function () {
 
     // ユーザ用のルーティング
     Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/attendance', [AttendanceController::class, 'register'])
+        Route::get('/attendance', function () {
+            return view('test2');
+        })
             ->name('attendance.register');
+        // Route::get('/attendance', [AttendanceController::class, 'register'])
+        //     ->name('attendance.register');
         Route::post('/attendance/startwork', [AttendanceController::class, 'startWorkApi'])
             ->name('attendance.start-work');
         Route::post('/attendance/endwork', [AttendanceController::class, 'endWorkApi'])
@@ -90,14 +77,17 @@ Route::middleware('header')->group(function () {
     });
 
     // 管理者用のルーティング
-    Route::prefix('admin')->group(function() {
-        Route::get('/login', function() {
-            return view('auth.admin_login');
+    Route::get('/admin/login', function() {
+        return view('auth.admin_login');
+    });
+    Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])
+    ->name('admin-login');
+
+    Route::middleware(['auth:admin'])->group(function () {
+        Route::prefix('admin')->group(function() {
+            Route::get('/attendance/list', function() {
+                return view('test');
+            })->name('admin-home');
         });
-        Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-            ->name('auth-admin-login');
-        Route::get('/home', function() {
-            return '<p>管理者用のホーム画面</p>';
-        })->name('admin-home');
     });
 });
