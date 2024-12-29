@@ -10,6 +10,7 @@ use App\Http\Requests\LoginRequest;
 use App\Models\Admin;
 use App\Models\User;
 use App\Responses\LoginResponse;
+use App\Responses\LogoutResponse;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -30,6 +32,7 @@ class FortifyServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(LoginResponseContract::class, LoginResponse::class);
+        $this->app->bind(LogoutResponseContract::class, LogoutResponse::class);
     }
 
     /**
@@ -38,6 +41,7 @@ class FortifyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Fortify::authenticateUsing(function (Request $request) {
+            \Log::info('FortifyServiceProvider : admin'.$request->is('admin/*'));
             if ($request->is('admin/*')) {
                 $admin = Admin::where('email', $request->email)->first();
 
@@ -74,6 +78,9 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::loginView(function () {
+            if (request()->is('admin/*')) {
+                return view('auth.admin_login');
+            }
             return view('auth.login');
         });
 

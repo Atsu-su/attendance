@@ -7,10 +7,10 @@ use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 
 class LoginResponse implements LoginResponseContract
 {
+    // FortifyServiceProvider.phpでバインドしている
     public function toResponse($request)
     {
-        // ここで確実にリダイレクト先を制御できます
-        if ($request->is(config('fortify.routes.admin'))) {
+        if ($request->is('admin/*')) {
             return redirect()->intended(RouteServiceProvider::ADMIN_HOME);
         }
         return redirect()->intended(RouteServiceProvider::HOME);

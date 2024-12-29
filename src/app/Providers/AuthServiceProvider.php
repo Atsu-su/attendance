@@ -25,7 +25,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->when([AuthenticatedSessionController::class, AttemptToAuthenticate::class])
             ->needs(StatefulGuard::class)
             ->give(function () {
-                if (request()->is(config('fortify.routes.admin'))) {
+                if (request()->is('admin/*')) {
                     return Auth::guard('admin');
                 }
                 return Auth::guard('web');
