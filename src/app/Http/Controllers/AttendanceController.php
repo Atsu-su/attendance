@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StampCorrectionRequest;
 use App\Models\Attendance;
 use App\Models\BreakTime;
+use App\Models\RequestBreakTime;
+use App\Models\User;
 use App\Models\StampCorrectionRequest as ModelsStampCorrectionRequest;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
@@ -34,6 +37,58 @@ class AttendanceController extends Controller
     }
 
     /**
+     * 勤怠情報の整形
+     * @param Attendance $attendance
+     * @return Attendance $attendance
+     */
+    public function attendanceFormatConvert($attendance)
+    {
+        // -------------------
+        // 表記変更
+        // -------------------
+        $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
+        $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
+
+        // -------------------
+        // 滞在時間の計算
+        // -------------------
+        $startTime = $attendance->start_time === null ? null : Carbon::createFromFormat('H:i', $attendance->start_time);
+        $endTime = $attendance->end_time === null ? null : Carbon::createFromFormat('H:i', $attendance->end_time);
+        $timeInOffice = ($startTime === null || $endTime === null) ? null : $startTime->diffInMinutes($endTime);
+
+        // -------------------
+        // 休憩時間の計算
+        // -------------------
+        $totalBreakTime = 0;
+        $breakTimes = $attendance->breakTimes;
+
+        // 休憩時間の登録がある場合のみ計算（ない場合は0分）
+        if (!$breakTimes->isEmpty()) {
+            foreach ($breakTimes as $breakTime) {
+                $startTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->start_time));
+                $endTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->end_time));
+                $totalBreakTime += $startTime->diffInMinutes($endTime);
+            }
+        }
+
+        // -------------------
+        // 勤務時間の計算
+        // -------------------
+        // 出勤時間・退勤時間のいずれかが登録されていない場合はnull
+        $totalWorkTime = $timeInOffice === null ? null : $timeInOffice - $totalBreakTime;
+
+        // -------------------
+        // 表記変更
+        // formatメソッドが使えない
+        // -------------------
+        // minutesFormatConvertメソッドは引数がnullの場合はnullを返す
+        $attendance->total_break_time = $this->minutesFormatConvert($totalBreakTime);
+        $attendance->total_work_time = $this->minutesFormatConvert($totalWorkTime);
+
+        return $attendance;
+    }
+
+    /**
      * abortするかを判定
      * @param $callback, $code
      * @return Illuminate\Http\Response
@@ -53,7 +108,6 @@ class AttendanceController extends Controller
      * @return bool
      * $id: attendancesテーブルのid
      */
-
     public function checkAttendanceOwner($id, $user)
     {
         $attendance = Attendance::where('id', $id)->first();
@@ -67,7 +121,7 @@ class AttendanceController extends Controller
 
     // ----------------------------------
     // テスト用の日付
-    const DAY = 0;
+    const DAY = -30;
     private $now;
 
     public function __construct()
@@ -78,6 +132,13 @@ class AttendanceController extends Controller
 
     public function index()
     {
+        if (auth('admin')->check()) {
+           return redirect()->route('admin-attendance.show-daily-list', [
+               'year' => date('Y'),
+               'month' => date('m'),
+               'day' => date('d')
+           ]);
+        }
         return redirect()->route('login');
     }
 
@@ -117,7 +178,7 @@ class AttendanceController extends Controller
             }
         }
 
-        return view('attendance_register', compact('now', 'attendance'));
+        return view('user_attendance_register', compact('now', 'attendance'));
     }
 
     /**
@@ -286,9 +347,13 @@ class AttendanceController extends Controller
      * 勤怠一覧の表示
      * @param int $year, $month
      */
-    public function showList($year, $month)
+    public function showList($year, $month, $id = null)
     {
-        $user = auth()->user();
+        if (auth('admin')->check()) {
+            $user = User::find($id);
+        } else {
+            $user = auth()->user();
+        }
 
         // 与えられた月が未来の場合はabort403
         $this->abort(function () use ($year, $month) {
@@ -296,12 +361,10 @@ class AttendanceController extends Controller
                 return true;    // abort(403)
             }
             return false;
-        }, 404);
+        }, 403);
 
         // ----------------------------------
-        //
         // 日付・時間の取得
-        //
         // ----------------------------------
         // 基準となる日付（これを直接メソッドチェーンで使用しないこと）
         $date = Carbon::create($year, $month, 1);
@@ -318,61 +381,11 @@ class AttendanceController extends Controller
                 $endOfMonth->format('Y-m-d')])
             ->get()
             ->map(function ($attendance) {
-
-                // ===================================================
-                // ＜重要＞
-                // 時間が登録されていない場合は計算せず、結果はnullとする
-                // ===================================================
-
-                // -------------------
-                // 表記変更
-                // -------------------
-                $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
-                $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
-
-                // -------------------
-                // 滞在時間の計算
-                // -------------------
-                $startTime = $attendance->start_time === null ? null : Carbon::createFromFormat('H:i', $attendance->start_time);
-                $endTime = $attendance->end_time === null ? null : Carbon::createFromFormat('H:i', $attendance->end_time);
-                $timeInOffice = ($startTime === null || $endTime === null) ? null : $startTime->diffInMinutes($endTime);
-
-                // -------------------
-                // 休憩時間の計算
-                // -------------------
-                $totalBreakTime = 0;
-                $breakTimes = $attendance->breakTimes;
-
-                // 休憩時間の登録がある場合のみ計算
-                if (!$breakTimes->isEmpty()) {
-                    foreach ($breakTimes as $breakTime) {
-                        $startTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->start_time));
-                        $endTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->end_time));
-                        $totalBreakTime += $startTime->diffInMinutes($endTime);
-                    }
-                }
-
-                // -------------------
-                // 勤務時間の計算
-                // -------------------
-                // 出勤時間・退勤時間のいずれかが登録されていない場合はnull
-                $totalWorkTime = $timeInOffice === null ? null : $timeInOffice - $totalBreakTime;
-
-                // -------------------
-                // 表記変更
-                // formatメソッドが使えない
-                // -------------------
-                // minutesFormatConvertメソッドは引数がnullの場合はnullを返す
-                $attendance->total_break_time = $this->minutesFormatConvert($totalBreakTime);
-                $attendance->total_work_time = $this->minutesFormatConvert($totalWorkTime);
-
-                return $attendance;
+                return $this->attendanceFormatConvert($attendance);
             });
 
         // ----------------------------------
-        //
         // データ整形
-        //
         // ----------------------------------
         // データがある場合のみデータを埋める
         if ($attendances->count() !== 0) {
@@ -390,6 +403,7 @@ class AttendanceController extends Controller
         }
 
         $data = [
+            'user' => $user,
             'attendances' => $attendances,
             'date' => $date,
             'days' => $days,
@@ -397,7 +411,7 @@ class AttendanceController extends Controller
             'nextDate' => $date->copy()->addMonth(),
         ];
 
-        return view('attendance_list', $data);
+        return view('common_attendance_list', $data);
     }
 
     /**
@@ -417,7 +431,7 @@ class AttendanceController extends Controller
             return redirect()->route('attendance.show', $attendance->id);
         }
 
-        // return view('attendance_detail_create');
+        // return view('user_attendance_detail_create');
         return '<p>OK</p>';
     }
 
@@ -428,9 +442,14 @@ class AttendanceController extends Controller
      */
     public function show($id)
     {
-        // 勤怠情報の所有者か確認
-        $user = auth()->user();
-        $this->checkAttendanceOwner($id, $user);
+        $admin = auth('admin')->user();
+
+        // adminガードの場合はアクセス可能
+        if (!$admin) {
+            // webガードの場合は勤怠情報の所有者か確認
+            $user = auth('web')->user();
+            $this->checkAttendanceOwner($id, $user);
+        }
 
         // 申請は複数回可能なため最後の申請を取得
         $request = ModelsStampCorrectionRequest::with('requestBreakTimes')
@@ -464,7 +483,7 @@ class AttendanceController extends Controller
                         return $breakTime;
                     });
 
-                return view('attendance_detail', compact('isApplicableForDate', 'isApplicable', 'attendance', 'breakTimes'));
+                return view('common_attendance_detail', compact('isApplicableForDate', 'isApplicable', 'attendance', 'breakTimes'));
 
             } else {
 
@@ -482,53 +501,207 @@ class AttendanceController extends Controller
                         return $requestBreakTime;
                     });
 
-                return view('attendance_detail', compact('isApplicableForDate', 'isApplicable', 'request', 'requestBreakTimes'));
+                return view('common_attendance_detail', compact('isApplicableForDate', 'isApplicable', 'request', 'requestBreakTimes'));
             }
         } else {
 
             $isApplicableForDate = false;
 
-            return view('attendance_detail', compact('isApplicableForDate'));
+            return view('common_attendance_detail', compact('isApplicableForDate'));
         }
     }
 
+    /**
+     * 申請内容の登録
+     * @param StampCorrectionRequest $request, $id
+     * $id: attendancesテーブルのid
+     */
     public function store(StampCorrectionRequest $request, $id)
     {
-        $user = auth()->user();
-
-        // 勤怠情報の所有者か確認
-        $user = auth()->user();
-        $this->checkAttendanceOwner($id, $user);
-
-        // 申請情報の登録
-        ModelsStampCorrectionRequest::create([
-            'attendance_id' => $id,
-            'user_id' => $user->id,
-            'is_approved' => false,
-            'request_date' => now()->format('Y-m-d'),
-            'start_time' => $request->input('start_time'),
-            'end_time' => $request->input('end_time'),
-            'remarks' => $request->input('remarks'),
-        ]);
-
-        // 休憩時間の登録
-        $breakStartTime = $request->input('break_start_time');
-        $breakEndTime = $request->input('break_end_time');
-        foreach ($breakStartTime as $key => $breakStartTime) {
-            $breakEndTime = $breakEndTime[$key];
-            BreakTime::create([
-                'attendance_id' => $id,
-                'start_time' => $breakStartTime,
-                'end_time' => $breakEndTime,
-            ]);
+        // 直接POSTされたときのための対策
+        $admin = auth('admin')->user();
+        // adminガードの場合はアクセス可能
+        if (!$admin) {
+            // webガードの場合は勤怠情報の所有者か確認
+            $user = auth('web')->user();
+            $this->checkAttendanceOwner($id, $user);
         }
 
-        return redirect()->route('stamp-correction-request.list');
+        $attendance = Attendance::find($id);
+
+        try{
+            DB::transaction(function () use ($request, $id, $attendance) {
+                // 申請情報の登録
+                $stampCorrectionRequest =  ModelsStampCorrectionRequest::create([
+                    'attendance_id' => $id,
+                    'user_id' => $attendance->user_id,
+                    'is_approved' => false,
+                    'request_date' => now()->format('Y-m-d'),
+                    'start_time' => $request->input('start_time'),
+                    'end_time' => $request->input('end_time'),
+                    'remarks' => $request->input('remarks'),
+                ]);
+
+                // 休憩時間の登録
+                $breakStartTime = $request->input('break_start_time');
+                $breakEndTime = $request->input('break_end_time');
+
+                foreach ($breakStartTime as $key => $startTime) {
+                    $endTime = $breakEndTime[$key];
+                    RequestBreakTime::create([
+                        'stamp_correction_request_id' => $stampCorrectionRequest->id,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                    ]);
+                }
+            });
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            if ($admin) {
+                return redirect()->route('admin-attendance.show', $id);
+            }
+            return redirect()->route('attendance.show', $id);
+        }
+
+        if ($admin) {
+            return redirect()->route('admin-stamp-correcion-request.index');
+        }
+        return redirect()->route('stamp-correction-request.index');
+    }
+
+    /**
+     * （管理者）勤怠一覧表示
+     * @param int $year, $month, $day
+     */
+    public function showDailyList($year, $month, $day)
+    {
+        $date = Carbon::create($year, $month, $day);
+        // $date = $this->now;
+        $prevDate = $date->copy()->subDay();
+        $nextDate = $date->copy()->addDay();
+
+        $count = 0;
+        $isNoData = false;
+
+        $users = User::with(['attendances' => function ($query) use ($date) {
+            $query->where('date', $date->format('Y-m-d'));
+        }, 'attendances.breakTimes'])
+            ->orderBy('id')
+            ->get()
+            ->map(function ($user) use (&$count) {
+                if (empty($user->attendances[0])) {
+                    // Undefined offset: 0への対応
+                    $user->attendances[0] = new Attendance();
+                    $count++;
+                } else {
+                    $this->attendanceFormatConvert($user->attendances[0]);
+                }
+
+                return $user;
+            });
+
+            if ($count === count($users)) {
+                $isNoData = true;
+            }
+
+        return view('admin_daily_attendance_list', compact('date', 'prevDate', 'nextDate', 'users', 'isNoData'));
+    }
+    // 勤怠詳細の表示
+
+    /**
+     * （管理者）CSVファイルの出力
+     */
+    public function exportCsv($year, $month, $id)
+    {
+        $user = User::find($id);
+
+        // ----------------------------------
+        // 日付・時間の取得
+        // ----------------------------------
+        // 基準となる日付（これを直接メソッドチェーンで使用しないこと）
+        $date = Carbon::create($year, $month, 1);
+        $date->settings(['monthOverflow' => false]);
+
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth = $date->copy()->endOfMonth();
+        $days = $startOfMonth->diff($endOfMonth)->days + 1;
+
+        $attendances = Attendance::with('breakTimes')
+            ->where('user_id', $user->id)
+            ->whereBetween('date', [
+                $startOfMonth->format('Y-m-d'),
+                $endOfMonth->format('Y-m-d')])
+            ->get()
+            ->map(function ($attendance) {
+                return $this->attendanceFormatConvert($attendance);
+            });
+
+        // ----------------------------------
+        // データ整形
+        // ----------------------------------
+        // データがある場合のみデータを埋める
+        if ($attendances->count() !== 0) {
+            // 連想配列のキーをdateに変更
+            $attendances = $attendances->keyBy('date');
+
+            // $keyDateは対象月の1日（11月1日など）
+            $keyDate = $startOfMonth->copy();
+            for ($i = 0; $i < $days; $i++) {
+                if (!isset($attendances[$keyDate->format('Y-m-d')])) {
+                    $attendances->put($keyDate->format('Y-m-d'), null);
+                }
+                $keyDate->addDay();
+            }
+        }
+
+        // ----------------------------------
+        // CSVファイルの出力
+        // ----------------------------------
+        // map内で配列をreturnするために先に日付を-1日する
+        $csvKeyDate = $startOfMonth->copy()->subDay();
+        $csvFileName = "attendance_{$user->family_name}{$user->given_name}_{$year}_{$month}.csv";
+        $csvData = $attendances
+            ->sortKeys()
+            ->map(function ($attendance) use (&$csvKeyDate) {
+                $csvKeyDate->addDay();
+                return [
+                    'date' =>  $attendance->date ?? $csvKeyDate->format('Y-m-d'),
+                    'start_time' => $attendance->start_time ?? '',
+                    'end_time' => $attendance->end_time ?? '',
+                    'total_break_time' => $attendance->total_break_time ?? '',
+                    'total_work_time' => $attendance->total_work_time ?? '',
+                ];
+            });
+
+        // CSVヘッダー
+        $headers = [
+            'date',
+            'start_time',
+            'end_time',
+            'total_break_time',
+            'total_work_time'
+        ];
+
+        // CSVをダウンロード
+        return response()
+            ->streamDownload(function() use ($csvData, $headers) {
+                $handle = fopen('php://output', 'w');
+
+                // BOMを追加（Excelで開いたときの文字化け防止）
+                fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+                // ヘッダーを書き込み
+                fputcsv($handle, $headers);
+
+                // データを書き込み
+                foreach ($csvData as $row) {
+                    fputcsv($handle, $row);
+                }
+
+                fclose($handle);
+
+            }, $csvFileName, ['Content-Type' => 'text/csv',]);
     }
 }
 
-    // 管理者編
-    //
-    // 勤怠一覧の表示
-    // 勤怠詳細の表示
-    // スタッフ別勤怠一覧の表示
+

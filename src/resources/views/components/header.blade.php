@@ -5,9 +5,9 @@
 
       {{-- 管理者用 --}}
       @if (auth('admin')->check())
-        <a class="nav-link" href="">勤怠一覧</a>
-        <a class="nav-link" href="">スタッフ一覧</a>
-        <a class="nav-link" href="">申請一覧</a>
+        <a class="nav-link" href="{{ route('admin-attendance.show-daily-list', ['year' =>  request()->year, 'month' =>  request()->month, 'day' =>  request()->day]) }}">勤怠一覧</a>
+        <a class="nav-link" href="{{ route('admin-staff.show-list') }}">スタッフ一覧</a>
+        <a class="nav-link" href="{{ route('admin-stamp-correction-request.index') }}">申請一覧</a>
         <form action="{{ route('admin-logout') }}" method="post">
           @csrf
           <button class="nav-link" type="submit">ログアウト</button>
@@ -18,7 +18,7 @@
       @if (auth('web')->check())
         <a class="nav-link" href="{{ route('attendance.register') }}">勤怠</a>
         <a class="nav-link" href="{{ route('attendance.show-list', ['year' => request()->year, 'month' => request()->month]) }}">勤怠一覧</a>
-        <a class="nav-link" href="{{ route('stamp-correction-request.list') }}">申請</a>
+        <a class="nav-link" href="{{ route('stamp-correction-request.index') }}">申請</a>
         <form action="{{ route('logout') }}" method="post">
           @csrf
           <button class="nav-link" type="submit">ログアウト</button>
@@ -32,9 +32,9 @@
 
         {{-- 管理者用 --}}
         @if (auth('admin')->check())
-          <a class="nav-link" href="">勤怠一覧</a>
-          <a class="nav-link" href="">スタッフ一覧</a>
-          <a class="nav-link" href="">申請一覧</a>
+          <a class="nav-link" href="{{ route('admin-attendance.show-daily-list', ['year' =>  request()->year, 'month' =>  request()->month, 'day' =>  request()->day]) }}">勤怠一覧</a>
+          <a class="nav-link" href="{{ route('admin-staff.show-list') }}">スタッフ一覧</a>
+          <a class="nav-link" href="{{ route('admin-stamp-correction-request.index') }}">申請一覧</a>
           <form action="{{ route('admin-logout') }}" method="post">
             @csrf
             <button class="nav-link" type="submit">ログアウト</button>
@@ -45,7 +45,7 @@
         @if (auth('web')->check())
           <a class="nav-link" href="{{ route('attendance.register') }}">勤怠</a>
           <a class="nav-link" href="{{ route('attendance.show-list', ['year' => request()->year, 'month' => request()->month]) }}">勤怠一覧</a>
-          <a class="nav-link" href="{{ route('stamp-correction-request.list') }}">申請</a>
+          <a class="nav-link" href="{{ route('stamp-correction-request.index') }}">申請</a>
           <form action="{{ route('logout') }}" method="post">
             @csrf
             <button class="nav-link" type="submit">ログアウト</button>

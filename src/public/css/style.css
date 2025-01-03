@@ -338,6 +338,13 @@ a:hover {
   font-weight: 700;
 }
 
+.c-btn--attendance-list {
+  width: 130px;
+  height: 50px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
 /* ---------------------- */
 /* デフォルトのフォーム
 /* ---------------------- */
@@ -653,7 +660,9 @@ a:hover {
 
 .c-table--stamp-correction-request .header th:nth-child(4),
 .c-table--stamp-correction-request .data td:nth-child(4) {
+  padding-right: 10px;
   width: 180px;
+  line-height: 1.2;
 }
 
 .c-table--stamp-correction-request .header th:last-child,
@@ -1032,7 +1041,12 @@ body {
 }
 
 #attendance-list .table {
-  margin: 46px 0 114px;
+  margin: 46px 0 0;
+}
+
+/* ボタンがない場合はdivを置いてマージンを作る */
+#attendance-list .margin {
+  margin-bottom: 114px;
 }
 
 #attendance-list .month {
@@ -1115,6 +1129,10 @@ body {
 
 #attendance-list .data-no-registration {
   width: calc(100% - 238px);
+}
+
+#attendance-list .button {
+  margin: 30px 0 84px auto;
 }
 
 /* ----------------------- */
@@ -1219,4 +1237,96 @@ body {
 
 #staff-list .table {
   margin: 30px 0 50px;
+}
+
+/* ----------------------- */
+/* admin_daily_attendance_list.blade.php
+/* 勤怠一覧（#attendance-list）
+/* c-tableを使用
+/* ----------------------- */
+#admin-daily-attendance-list {
+  background-color: var(--color-bg-base);
+  overflow: hidden;
+}
+
+#admin-daily-attendance-list .table {
+  margin: 46px 0 114px;
+}
+
+#admin-daily-attendance-list .day {
+  margin-top: 47px;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-white);
+  border-radius: 10px;
+}
+
+#admin-daily-attendance-list .day-prev,
+#admin-daily-attendance-list .day-next {
+  position: relative;
+  color: var(--color-font-light-gray);
+}
+
+#admin-daily-attendance-list .day-prev {
+  padding-left: 52px;
+  display: block;
+}
+
+#admin-daily-attendance-list .day-prev::before {
+  content: '';
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  position: absolute;
+  left: 24px;
+  top: 2px;
+  background-image: url(../img/icon_prev_arrow.jpg);
+  background-size: cover;
+}
+
+#admin-daily-attendance-list .day-current {
+  position: relative;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+#admin-daily-attendance-list .day-current::before {
+  content: '';
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  position: absolute;
+  top: -3px;
+  left: -35px;
+  background-image: url(../img/icon_calendar.jpg);
+  background-size: cover;
+}
+
+#admin-daily-attendance-list .day-next {
+  padding-right  : 52px;
+  display: block;
+}
+
+#admin-daily-attendance-list .day-next::before {
+  content: '';
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  position: absolute;
+  right: 24px;
+  top: 2px;
+  background-image: url(../img/icon_next_arrow.jpg);
+  background-size: cover;
+}
+
+#admin-daily-attendance-list .day-opacity-0 {
+  opacity: 0;
+}
+
+#admin-daily-attendance-list .no-data-message {
+  margin-top: 46px;
+  text-align: center;
 }

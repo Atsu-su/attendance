@@ -13,56 +13,13 @@
           <th>メールアドレス</th>
           <th>月次勤怠</th>
         </tr>
+        @foreach ($users as $user)
         <tr class="data">
-          <td>とまと</td>
-          <td>tomato@wavelucky.co.jp.us</td>
+          <td>{{ $user->family_name}}&ensp;{{ $user->given_name }}</td>
+          <td>{{ $user->email }}</td>
           <td>詳細</td>
         </tr>
-        <tr class="data">
-          <td>パラシュート部隊</td>
-          <td>parachute@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>線路</td>
-          <td>railroad@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>架線</td>
-          <td>cable@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>サマンサ</td>
-          <td>samantha@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>とどろく土星</td>
-          <td>saturn@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>ろくろ首</td>
-          <td>longneck@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>長崎のかぜ</td>
-          <td>windblowinnagasaki@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>流行した病の亜種</td>
-          <td>anothercorona@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
-        <tr class="data">
-          <td>加熱した金属の破片</td>
-          <td>heatedmetal@wavelucky.co.jp.us</td>
-          <td>詳細</td>
-        </tr>
+        @endforeach
       </table>
     </div>
   </div>

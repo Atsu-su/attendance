@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class HeaderType
+class GetDate
 {
     /**
      * Handle an incoming request.
@@ -18,26 +18,12 @@ class HeaderType
     {
         $year = date('Y');
         $month = date('m');
-        $headerType = $this->determineHeaderType($request);
+        $day =  date('d');
         $request->merge([
             'year' => $year,
             'month' => $month,
-            'headerType' => $headerType
+            'day' => $day
         ]);
         return $next($request);
-    }
-
-    public function determineHeaderType(Request $request): string
-    {
-        /*
-        * ロゴのみの/login, /registerの場合はnullが渡される
-        */
-        if (auth()->check()) {
-            // 認証済の場合、ログアウトボタンを表示
-            return 'logOut';
-        } else {
-            // 未認証の場合、ログインボタンを表示
-            return 'logIn';
-        }
     }
 }

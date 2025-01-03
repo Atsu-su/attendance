@@ -22,15 +22,21 @@
               <th>申請日時</th>
               <th>詳細</th>
             </tr>
-            @foreach ($requests as $request)
+            @foreach ($formattedRequests as $request)
               @if ($request->is_approved == 0)
                 <tr class="data">
                   <td>{{ $request->approval_status }}</td>
                   <td>{{ $request->user->family_name }}&ensp;{{ $request->user->given_name }}</td>
-                  <td>{{ $request->attendance->date }}</td>
+                  <td>{{ $request->date }}</td>
                   <td>{{ $request->remarks }}</td>
                   <td>{{ $request->request_date}}</td>
-                  <td><a href="{{ route('attendance.show', $request->attendance_id) }}">詳細</a></td>
+                  <td>
+                    @if (auth('admin')->check())
+                      <a href="{{ route('admin-attendance.show', $request->attendance_id) }}">詳細</a>
+                    @else
+                      <a href="{{ route('attendance.show', $request->attendance_id) }}">詳細</a>
+                    @endif
+                  </td>
                 </tr>
               @endif
             @endforeach
@@ -39,6 +45,7 @@
         <div id="second-tab" class="tab second-tab js-hidden">
           <table class="c-table c-table--stamp-correction-request table">
             <tr class="header">
+              <th>id</th>
               <th>状態</th>
               <th>名前</th>
               <th>対象日時</th>
@@ -46,15 +53,22 @@
               <th>申請日時</th>
               <th>詳細</th>
             </tr>
-            @foreach ($requests as $request)
+            @foreach ($formattedRequests as $request)
               @if ($request->is_approved == 1)
                 <tr class="data">
+                  <td>{{ $request->id }}</td>
                   <td>{{ $request->approval_status }}</td>
                   <td>{{ $request->user->family_name }}&ensp;{{ $request->user->given_name }}</td>
-                  <td>{{ $request->attendance->date }}</td>
+                  <td>{{ $request->date }}</td>
                   <td>{{ $request->remarks }}</td>
                   <td>{{ $request->request_date}}</td>
-                  <td><a href="{{ route('stamp-correction-request.show', $request->id) }}">詳細</a></td>
+                  <td>
+                    @if (auth('admin')->check())
+                      <a href="{{ route('admin-stamp-correction-request.show', $request->id) }}">詳細</a>
+                    @else
+                      <a href="{{ route('stamp-correction-request.show', $request->id) }}">詳細</a>
+                    @endif
+                  </td>
                 </tr>
               @endif
             @endforeach

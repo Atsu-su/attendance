@@ -6,12 +6,24 @@
 @section('content')
   <div id="attendance-list" class="cmn-page">
     <div class="l-container-60">
-      <h1 class="c-title">勤怠一覧</h1>
+      @if (auth('admin')->check())
+        <h1 class="c-title">{{ $user->family_name }}{{ $user->given_name }}さんの勤怠</h1>
+      @else
+        <h1 class="c-title">勤怠一覧</h1>
+      @endif
       <div class="month">
-        <a class="month-prev" href="{{ route('attendance.show-list', ['year' => $prevDate->format('Y'), 'month' => $prevDate->format('m')])}}">前月</a>
+        @if (auth('admin')->check())
+          <a class="month-prev" href="{{ route('admin-attendance.show-list', ['year' => $prevDate->format('Y'), 'month' => $prevDate->format('m'), 'id' =>  $user->id])}}">前月</a>
+        @else
+          <a class="month-prev" href="{{ route('attendance.show-list', ['year' => $prevDate->format('Y'), 'month' => $prevDate->format('m')])}}">前月</a>
+        @endif
         <p class="month-current">{{ $date->isoFormat('YYYY年MM月') }}</p>
-        @if ($date->format('Y-m') !== now()->format('Y-m'))
-          <a class="month-next" href="{{ route('attendance.show-list', ['year' => $nextDate->format('Y'), 'month' => $nextDate->format('m')])}}">翌月</a>
+        @if ($date->format('Y-m') < now()->format('Y-m'))
+          @if (auth('admin')->check())
+            <a class="month-next" href="{{ route('admin-attendance.show-list', ['year' => $nextDate->format('Y'), 'month' => $nextDate->format('m'), 'id' => $user->id])}}">翌月</a>
+          @else
+            <a class="month-next" href="{{ route('attendance.show-list', ['year' => $nextDate->format('Y'), 'month' => $nextDate->format('m')])}}">翌月</a>
+          @endif
         @else
           <p class="month-next month-opacity-0">翌月</p>
         @endif
@@ -48,6 +60,14 @@
           </tr>
           @endfor
         </table>
+        @if (auth('admin')->check())
+          <form action="{{ route('admin-attendance.export-csv', ['year' => $date->format('Y'), 'month' => $date->format('m'), 'id' => $user->id]) }}" method="post">
+            @csrf
+            <button class="button c-btn c-btn--black c-btn--attendance-list" type="submit">CSV出力</button>
+          </form>
+        @else
+          <div class="margin"></div>
+        @endif
       @endif
     </div>
   </div>

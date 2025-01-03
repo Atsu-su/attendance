@@ -9,7 +9,11 @@
       @if ($isApplicableForDate == true)
         @if ($isApplicable == true)
         <h1 class="c-title">勤怠詳細<span>（申請）</span></h1>
-          <form action="{{ route('attendance.store', $attendance->id) }}" method="POST">
+          @if (auth('admin')->check())
+            <form action="{{ route('admin-attendance.store', $attendance->id) }}" method="post">
+          @else
+            <form action="{{ route('attendance.store', $attendance->id) }}" method="post">
+          @endif
             @csrf
             <table class="c-table-detail edit-table">
               <tr>
@@ -20,7 +24,6 @@
                 <th>日付</th>
                 <td class="date">{{ $attendance->date }}</td>
               </tr>
-              {{-- c-next-row-has-errorを@ifで条件分岐 --}}
               <tr>
                 <th>出勤・退勤</th>
                 <td>

@@ -11,6 +11,8 @@ class RequestBreakTime extends Model
     use HasFactory;
     use DateTimeFormatTrait;
 
+    protected $guarded = ['id'];
+
     public function stampCorrectionRequest()
     {
         return $this->belongsTo(StampCorrectionRequest::class);
