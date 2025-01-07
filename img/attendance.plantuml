@@ -9,106 +9,75 @@ entity "users" as users {
   id
   --
   is_active
-  name
+  family_name
+  given_name
   email
   email_verified_at
   password
-  image
-  postal_code
-  address
-  building_name
   created_at
   updated_at
 }
 
-entity "categories" as categories {
+entity "admins" as admins {
   id
   --
-  category
+  family_name
+  given_name
+  email
+  password
   created_at
   updated_at
 }
 
-entity "category_item" as category_item {
+entity "attendances" as attendances {
   id
   --
-  category_id<<FK>>
-  item_id<<FK>>
-  created_at
-  updated_at
-}
-
-entity "conditions" as conditions {
-  id
-  --
-  condition
-  created_at
-  updated_at
-}
-
-entity "items" as items {
-  id
-  --
-  seller_id<<FK>>
-  on_sale
-  name
-  price
-  brand
-  condition_id<<FK>>
-  description
-  image
-  created_at
-  updated_at
-}
-
-entity "payment_methods" as payment_methods {
-  id
-  --
-  payment_method
-  created_at
-  updated_at
-}
-
-entity "purchases" as purchases {
-  id
-  --
-  buyer_id<<FK>>
-  item_id<<FK>>
-  payment_method_id<<FK>>
+  user_id<FK>
+  date
   status
+  start_time
+  end_time
   created_at
   updated_at
 }
 
-entity "likes" as likes {
+entity "break_times" as break_times {
   id
   --
-  item_id<<FK>>
-  user_id<<FK>>
+  attendance_id<FK>
+  start_time
+  end_time
   created_at
   updated_at
 }
 
-entity "comments" as comments {
+entity "stamp_correction_requests" as stamp_correction_requests {
   id
   --
-  item_id<<FK>>
-  user_id<<FK>>
-  comment
+  attendance_id<FK>
+  user_id<FK>
+  is_approved
+  request_date
+  start_time
+  end_time
+  remarks
   created_at
   updated_at
 }
 
-categories ||--o{ category_item
-conditions ||--o{ items
-items ||--|{ category_item
-items ||--o{ likes
-items ||--o| purchases
-items ||--o{ comments
-items }o--|| users
-purchases }o--|| users
-users ||--o{ likes
-users ||--o{ comments
-purchases }o--|| payment_methods
+entity "request_break_times" as request_break_times {
+  id
+  --
+  stamp_correction_request_id<FK>
+  start_time
+  end_time
+  created_at
+  updated_at
+}
+
+attendances ||--o{ break_times
+users ||--o{ attendances
+stamp_correction_requests ||--|{ request_break_times
+users ||--o{ stamp_correction_requests
 
 @enduml

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StampCorrectionRequestController;
@@ -28,9 +29,8 @@ Route::middleware('date')->group(function () {
     // 管理者用のルーティング
     // -----------------------------------------------------
     // 管理者ログイン画面
-    Route::get('admin/login', function() {
-        return view('auth.admin_login');
-        })->middleware('web', 'guest:admin');
+    Route::get('admin/login', [AdminLoginController::class, 'index'])
+        ->middleware('web', 'guest:admin');
 
     Route::post('admin/login', [AuthenticatedSessionController::class, 'store'])
         ->middleware(['guest:admin'])
@@ -57,11 +57,11 @@ Route::middleware('date')->group(function () {
             Route::get('attendance/{year}/{month}/{day}/{id}', [AttendanceController::class, 'create'])
                 ->whereNumber(['year', 'month', 'day', 'id']) // 数字のみ許可
                 ->name('admin-attendance.create');
-            Route::get('staff/list', [StaffController::class, 'showStaffList'])
-                ->name('admin-staff.show-list');
-            Route::post('csv/{year}/{month}/{id}', [AttendanceController::class, 'exportCsv'])
+            Route::get('csv/{year}/{month}/{id}', [AttendanceController::class, 'exportCsv'])
                 ->whereNumber(['year', 'month', 'id'])        // 数字のみ許可
                 ->name('admin-attendance.export-csv');
+            Route::get('staff/list', [StaffController::class, 'showList'])
+                ->name('admin-staff.show-list');
 
             Route::get('stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
                 ->name('admin-stamp-correction-request.index');

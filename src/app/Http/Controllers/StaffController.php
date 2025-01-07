@@ -12,7 +12,7 @@ class StaffController extends Controller
      * @param int $id
      * $id: attendancesテーブルのid
      */
-     public function showStaffList()
+     public function showList()
      {
         $users = User::where('is_active', true)->get();
         return view('admin_staff_list', compact('users'));
