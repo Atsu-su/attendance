@@ -36,7 +36,7 @@
         </tr>
       </table>
       @if (auth('admin')->check() && !$request->is_approved)
-        <form action="{{ route('admin-attendance.storeRequest', ['stamp_correction_request' => $request->id]) }}" method="post">
+        <form action="{{ route('admin-attendance.update', ['stamp_correction_request' => $request->id]) }}" method="post">
           @csrf
           <button class="button c-btn c-btn--black c-btn--attendance-correction" type="submit">承認</button>
         </form>

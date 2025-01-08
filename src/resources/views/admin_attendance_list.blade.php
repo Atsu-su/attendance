@@ -43,7 +43,7 @@
               <td>--:--</td>
               <td>--:--</td>
               <td>--:--</td>
-              <td><a href="{{ route('attendance.create', $date->format('Y-m-d'))}}">詳細</a></td>
+              <td>--</td>
             @endif
           </tr>
           @endfor

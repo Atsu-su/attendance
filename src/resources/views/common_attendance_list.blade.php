@@ -62,7 +62,7 @@
               @if (auth('admin')->check())
                 <td><a href="{{ route('admin-attendance.create', ['year' => $date->format('Y'), 'month' => $date->format('m'), 'day' => $date->format('d'), 'id' => $user->id ]) }}">作成</a></td>
               @else
-                <td><a href="{{ route('attendance.create', ['year' => $date->format('Y'), 'month' => $date->format('m'), 'day' => $date->format('d')]) }}">作成</a></td>
+                <td>--</td>
               @endif
             @endif
           </tr>

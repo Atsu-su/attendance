@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StampCorrectionRequestController;
+use App\Http\Requests\StampCorrectionRequest;
 use App\Models\Attendance;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Route;
@@ -51,12 +52,11 @@ Route::middleware('date')->group(function () {
             Route::get('attendance/{id}', [AttendanceController::class, 'show'])
                 ->whereNumber('id')         // {id}は数字のみ許可
                 ->name('admin-attendance.show');
-            Route::post('attendance/{id}', [AttendanceController::class, 'store'])
-                ->whereNumber('id')         // {id}は数字のみ許可
-                ->name('admin-attendance.store');
             Route::get('attendance/{year}/{month}/{day}/{id}', [AttendanceController::class, 'create'])
                 ->whereNumber(['year', 'month', 'day', 'id']) // 数字のみ許可
                 ->name('admin-attendance.create');
+            Route::post('attendance/store', [AttendanceController::class, 'store'])
+                ->name('admin-attendance.store');
             Route::get('csv/{year}/{month}/{id}', [AttendanceController::class, 'exportCsv'])
                 ->whereNumber(['year', 'month', 'id'])        // 数字のみ許可
                 ->name('admin-attendance.export-csv');
@@ -65,6 +65,9 @@ Route::middleware('date')->group(function () {
 
             Route::get('stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
                 ->name('admin-stamp-correction-request.index');
+            Route::post('stamp_correction_request/{id}', [StampCorrectionRequestController::class, 'store'])
+                ->whereNumber('id')         // {id}は数字のみ許可
+                ->name('admin-stamp-correction-request.store');
 
             // -------------------------------------------------------------------
             // 結局同じメソッドを呼び出すのでルートを分ける必要はないが、意味が異なるので分ける
@@ -78,9 +81,9 @@ Route::middleware('date')->group(function () {
                 ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
                 ->name('admin-stamp-correction-request-approve.show');
 
-            Route::post('stamp_correction_request/approve/{stamp_correction_request}', [AttendanceController::class, 'storeRequest'])
+            Route::post('stamp_correction_request/approve/{stamp_correction_request}', [AttendanceController::class, 'update'])
                 ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
-                ->name('admin-attendance.storeRequest');
+                ->name('admin-attendance.update');
         });
     });
 
@@ -108,14 +111,12 @@ Route::middleware('date')->group(function () {
         Route::get('attendance/{id}', [AttendanceController::class, 'show'])
             ->whereNumber('id')         // {id}は数字のみ許可
             ->name('attendance.show');
-        Route::post('attendance/{id}', [AttendanceController::class, 'store'])
-            ->whereNumber('id')         // {id}は数字のみ許可
-            ->name('attendance.store');
-        Route::get('attendance/{year}/{month}/{day}', [AttendanceController::class, 'create'])
-            ->name('attendance.create');
 
         Route::get('stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
             ->name('stamp-correction-request.index');
+        Route::post('stamp_correction_request/{id}', [StampCorrectionRequestController::class, 'store'])
+            ->whereNumber('id')         // {id}は数字のみ許可
+            ->name('stamp-correction-request.store');
         Route::get('stamp-correction-request/{stamp_correction_request}', [StampCorrectionRequestController::class, 'show'])
             ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
             ->name('stamp-correction-request.show');

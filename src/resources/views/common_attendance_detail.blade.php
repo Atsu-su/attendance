@@ -10,9 +10,9 @@
         @if ($isApplicable)
         <h1 class="c-title">勤怠詳細<span>（申請）</span></h1>
           @if (auth('admin')->check())
-            <form action="{{ route('admin-attendance.store', $attendance->id) }}" method="post">
+            <form action="{{ route('admin-stamp-correction-request.store', $attendance->id) }}" method="post">
           @else
-            <form action="{{ route('attendance.store', $attendance->id) }}" method="post">
+            <form action="{{ route('stamp-correction-request.store', $attendance->id) }}" method="post">
           @endif
             @csrf
             <table class="c-table-detail edit-table">

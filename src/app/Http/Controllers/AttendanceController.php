@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AttendanceRequest;
 use App\Http\Requests\StampCorrectionRequest;
 use App\Models\Attendance;
 use App\Models\BreakTime;
 use App\Models\RequestBreakTime;
 use App\Models\User;
 use App\Models\StampCorrectionRequest as ModelsStampCorrectionRequest;
+use App\Traits\CheckTrait;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +17,8 @@ use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
+    use CheckTrait;
+
     /**
      * 分のフォーマット変換
      * @param int $mins
@@ -98,24 +102,6 @@ class AttendanceController extends Controller
         if ($callback()) {
             return abort($code);
         }
-    }
-
-    /**
-     * 勤怠情報の所有者かどうかを確認
-     * @param $id
-     * @return Illuminate\Http\Response
-     * @return bool
-     * $id: attendancesテーブルのid
-     */
-    public function checkAttendanceOwner($id, $user)
-    {
-        $attendance = Attendance::where('id', $id)->first();
-        if (!$attendance) {
-            return abort(404);
-        } else if ($attendance->user_id !== $user->id) {
-            return abort(403);
-        }
-        return true;
     }
 
     /**
@@ -389,50 +375,91 @@ class AttendanceController extends Controller
     }
 
     /**
-     * （共通）勤怠申請の作成
+     * （管理者）勤怠申請の作成
      * 勤怠情報未登録日の勤怠情報を登録する
      * @param int $date
      */
-    public function create($year, $month, $day, $id = null)
+    public function create($year, $month, $day, $id)
     {
-        if (auth('admin')->check()) {
-            $user = User::find($id);
-        } else {
-            $user = auth()->user();
-        }
+        $user = User::find($id);
+        $date = Carbon::create($year, $month, $day);
 
-        $date = Carbon::create($year, $month, $day)->format('Y-m-d');
         $attendance = Attendance::where('user_id', $user->id)
-            ->where('date', $date)
+            ->where('date', $date->copy()->format('Y-m-d'))
             ->first();
 
         // 勤怠情報が存在していれば作成不可
         if ($attendance) {
-            if (auth('admin')->check()) {
-                return redirect()->route('admin-attendance.show', $attendance->id);
-            }
-            return redirect()->route('attendance.show', $attendance->id);
+            return redirect()->route('admin-attendance.show', $attendance->id);
         }
 
         // 当日あるいは未来日付の場合は勤怠登録画面へリダイレクト
         if ($date >= now()->format('Y-m-d')) {
-            if (auth('admin')->check()) {
-                return abort(403);
-            }
-            return redirect()->route('attendance.register');
+            return abort(403);
         }
 
-        // 勤怠情報の登録
-        $attendance = Attendance::create([
-            'user_id' => $user->id,
-            'date' => $date,
-            'status' => Attendance::OFF_DUTY[0],
+        return view('admin_attendance_detail_create', compact('user', 'date'));
+
+        // // 勤怠情報の登録
+        // $attendance = Attendance::create([
+        //     'user_id' => $user->id,
+        //     'date' => $date,
+        //     'status' => Attendance::OFF_DUTY[0],
+        // ]);
+
+        // if (auth('admin')->check()) {
+        //     return redirect()->route('admin-attendance.show', $attendance->id);
+        // }
+        // return redirect()->route('attendance.show', $attendance->id);
+    }
+
+    /**
+     * （管理者）勤怠申請の作成
+     * 勤怠情報未登録日の勤怠情報を登録する
+     * @param int $date
+     */
+    public function store(AttendanceRequest $request)
+    {
+        $date = Carbon::create($request->input('date'));
+
+        try {
+            DB::transaction(function () use ($request) {
+                // 申請情報の登録
+                $attendance =  Attendance::create([
+                    'user_id' => $request->input('user_id'),
+                    'date' => $request->input('date'),
+                    'status' => Attendance::OFF_DUTY[0],
+                    'start_time' => $request->input('start_time'),
+                    'end_time' => $request->input('end_time'),
+                ]);
+
+                // 休憩時間の登録
+                $breakStartTime = $request->input('break_start_time');
+                $breakEndTime = $request->input('break_end_time');
+
+                foreach ($breakStartTime as $key => $startTime) {
+                    $endTime = $breakEndTime[$key];
+                    BreakTime::create([
+                        'attendance_id' => $attendance->id,
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                    ]);
+                }
+            });
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->route('admin-attendance.show-list', [
+                'year' => $date->format('Y'),
+                'month' => $date->format('m'),
+                'id' => $request->input('user_id'),
+            ]);
+        }
+
+        return redirect()->route('admin-attendance.show-list', [
+            'year' => $date->format('Y'),
+            'month' => $date->format('m'),
+            'id' => $request->input('user_id'),
         ]);
-
-        if (auth('admin')->check()) {
-            return redirect()->route('admin-attendance.show', $attendance->id);
-        }
-        return redirect()->route('attendance.show', $attendance->id);
     }
 
     /**
@@ -522,76 +549,6 @@ class AttendanceController extends Controller
 
             return view('common_attendance_detail', compact('isApplicableForDate'));
         }
-    }
-
-    /**
-     * （共通）申請内容の登録
-     * @param StampCorrectionRequest $request, $id
-     * $id: attendancesテーブルのid
-     */
-    public function store(StampCorrectionRequest $request, $id)
-    {
-        // 直接POSTされたときのための対策
-        $admin = auth('admin')->user();
-        // adminガードの場合はアクセス可能
-        if (!$admin) {
-            // webガードの場合は勤怠情報の所有者か確認
-            $user = auth('web')->user();
-            $this->checkAttendanceOwner($id, $user);
-        }
-
-        $attendance = Attendance::find($id);
-        $stampCorrectionRequest = ModelsStampCorrectionRequest::where('attendance_id', $id)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        // 申請が存在する AND 申請が承認されていない場合は申請不可
-        if ($stampCorrectionRequest && $stampCorrectionRequest->is_approved == 0) {
-            //申請できない
-            if (auth('admin')->check()) {
-                return redirect()->route('admin-attendance.show', $id);
-            }
-            return redirect()->route('attendance.show', $id);
-        }
-
-        try{
-            DB::transaction(function () use ($request, $id, $attendance) {
-                // 申請情報の登録
-                $stampCorrectionRequest =  ModelsStampCorrectionRequest::create([
-                    'attendance_id' => $id,
-                    'user_id' => $attendance->user_id,
-                    'is_approved' => false,
-                    'request_date' => now()->format('Y-m-d'),
-                    'start_time' => $request->input('start_time'),
-                    'end_time' => $request->input('end_time'),
-                    'remarks' => $request->input('remarks'),
-                ]);
-
-                // 休憩時間の登録
-                $breakStartTime = $request->input('break_start_time');
-                $breakEndTime = $request->input('break_end_time');
-
-                foreach ($breakStartTime as $key => $startTime) {
-                    $endTime = $breakEndTime[$key];
-                    RequestBreakTime::create([
-                        'stamp_correction_request_id' => $stampCorrectionRequest->id,
-                        'start_time' => $startTime,
-                        'end_time' => $endTime,
-                    ]);
-                }
-            });
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            if ($admin) {
-                return redirect()->route('admin-attendance.show', $id);
-            }
-            return redirect()->route('attendance.show', $id);
-        }
-
-        if ($admin) {
-            return redirect()->route('admin-stamp-correction-request.index');
-        }
-        return redirect()->route('stamp-correction-request.index');
     }
 
     /**
@@ -730,7 +687,7 @@ class AttendanceController extends Controller
      * （管理者）申請承認
      * @param int $year, $month, $day
      */
-    public function storeRequest($stamp_correction_request)
+    public function update($stamp_correction_request)
     {
         $request = ModelsStampCorrectionRequest::with('requestBreakTimes', 'attendance')->find($stamp_correction_request);
 
