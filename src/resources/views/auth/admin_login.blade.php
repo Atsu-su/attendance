@@ -9,12 +9,12 @@
   <form class="form" action="{{ route('admin-login') }}" method="post">
     @csrf
     <label class="form-title">メールアドレス</label>
-    <input class="form-input" type="text" name="email" value="{{ old('email') ?? \App\Models\Admin::find(1)->email }}">
+    <input class="form-input" type="text" name="email" value="{{ old('email') }}">
     @error('email')
     <p class="c-error-message">{{ $message }}</p>
     @enderror
     <label class="form-title">パスワード</label>
-    <input class="form-input" type="password" name="password" value="{{ old('password') ?? 'password' }}">
+    <input class="form-input" type="password" name="password" value="{{ old('password') }}">
     @error('password')
     <p class="c-error-message">{{ $message }}</p>
     @enderror

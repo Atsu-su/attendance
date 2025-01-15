@@ -1,6 +1,6 @@
 <div id="header">
   <img class="logo" src="{{ asset('img/logo.svg') }}" alt="carmeriのロゴ">
-  @if (auth('admin')->check() ||  auth('web')->check())
+  @if (auth('admin')->check() || (auth('web')->check() && !request()->is('email/verify')))
     <nav class="nav">
 
       {{-- 管理者用 --}}

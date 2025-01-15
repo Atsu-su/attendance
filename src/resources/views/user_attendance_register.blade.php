@@ -15,7 +15,7 @@
       <button id="on-duty-button" class="c-btn c-btn--black c-btn--attendance-register {{ $attendance->status == \App\Models\Attendance::BF_WORK[0] ? '' : 'js-hidden' }}">出勤</button>
       <div id="leave-buttons" class="buttons-leave {{ $attendance->status == \App\Models\Attendance::ON_DUTY[0] ? '' : 'js-hidden' }}">
         <button id="off-duty-button" class="c-btn c-btn--black c-btn--attendance-register">退勤</button>
-        <button id="break-start-button" class="c-btn c-btn--white c-btn--attendance-register">休憩</button>
+        <button id="break-start-button" class="c-btn c-btn--white c-btn--attendance-register">休憩入</button>
       </div>
       <button id="break-end-button" class="c-btn c-btn--white c-btn--attendance-register buttons-back-to-work {{ $attendance->status == \App\Models\Attendance::BREAK[0] ? '' : 'js-hidden' }}">休憩戻</button>
     </div>

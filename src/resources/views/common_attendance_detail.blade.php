@@ -46,7 +46,8 @@
                 @foreach($breakTimes as $breakTime)
                 <tr>
                   <th>休憩{{$loop->iteration == 1 ? '' : $loop->iteration}}</th>
-                  <td><input class="input-time" type="text" name="break_start_time[]" value="{{ old('break_start_time.'.$loop->index, $breakTime->start_time) }}" placeholder="12:00"><span class="wave">～</span><input class="input-time" type="text" name="break_end_time[]" value="{{ old('break_end_time.'.$loop->index, $breakTime->end_time) }}" placeholder="13:00">
+                  <td>
+                    <input class="input-time" type="text" name="break_start_time[]" value="{{ old('break_start_time.'.$loop->index, $breakTime->start_time) }}" placeholder="12:00"><span class="wave">～</span><input class="input-time" type="text" name="break_end_time[]" value="{{ old('break_end_time.'.$loop->index, $breakTime->end_time) }}" placeholder="13:00">
                     @if ($errors->has('break_start_time.'.$loop->index) || $errors->has('break_end_time.'.$loop->index))
                       <p class="c-table-error-message">{{ ($errors->first('break_start_time.'.$loop->index) ?: null) ?? $errors->first('break_end_time.'.$loop->index) }}</p>
                     @endif

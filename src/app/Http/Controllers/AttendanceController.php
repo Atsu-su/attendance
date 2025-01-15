@@ -68,9 +68,12 @@ class AttendanceController extends Controller
         // 休憩時間の登録がある場合のみ計算（ない場合は0分）
         if (!$breakTimes->isEmpty()) {
             foreach ($breakTimes as $breakTime) {
-                $startTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->start_time));
-                $endTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->end_time));
-                $totalBreakTime += $startTime->diffInMinutes($endTime);
+                // 休憩中のステータスの場合、end_timeがnullのため計算しない
+                if (!is_null($breakTime->end_time)) {
+                    $startTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->start_time));
+                    $endTime = Carbon::createFromFormat('H:i', $breakTime->timeFormatConvert($breakTime->end_time));
+                    $totalBreakTime += $startTime->diffInMinutes($endTime);
+                }
             }
         }
 

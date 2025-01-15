@@ -41,7 +41,6 @@ class FortifyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Fortify::authenticateUsing(function (Request $request) {
-            \Log::info('FortifyServiceProvider : admin'.$request->is('admin/*'));
             if ($request->is('admin/*')) {
                 $admin = Admin::where('email', $request->email)->first();
 

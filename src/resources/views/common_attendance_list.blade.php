@@ -69,7 +69,7 @@
           @endfor
         </table>
         @if (auth('admin')->check())
-          <form action="{{ route('admin-attendance.export-csv', ['year' => $date->format('Y'), 'month' => $date->format('m'), 'id' => $user->id]) }}" method="post">
+          <form action="{{ route('admin-attendance.export-csv', ['year' => $date->format('Y'), 'month' => $date->format('m'), 'id' => $user->id]) }}" method="get">
             @csrf
             <button class="button c-btn c-btn--black c-btn--attendance-list" type="submit">CSV出力</button>
           </form>

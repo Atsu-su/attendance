@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -17,5 +18,12 @@ abstract class TestCase extends BaseTestCase
         $user ??= User::factory()->create();
         $this->actingAs($user);
         return $user;
+    }
+
+    public function loginAsAdmin($admin = null)
+    {
+        $admin ??= Admin::factory()->create();
+        $this->actingAs($admin, 'admin');
+        return $admin;
     }
 }
