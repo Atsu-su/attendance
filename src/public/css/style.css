@@ -196,6 +196,7 @@ iframe {
   --color-bg-btn-red: #FF5555;
   --color-bg-modal: rgba(217, 217, 217, 0.6);
   --color-bg-black: #000;
+  --color-bg-gray: #696969;
   --color-bg-white: #fff;
   --color-bg-base: #F0EFF2;
   --color-font-base: #000;
@@ -271,6 +272,7 @@ a:hover {
   display: grid;
   place-items: center;
   cursor: pointer;
+  border-radius: 5px;
 }
 
 .c-btn:hover {
@@ -284,6 +286,11 @@ a:hover {
 .c-btn--black {
   color: var(--color-font-white);
   background-color: var(--color-bg-black);
+}
+
+.c-btn--gray {
+  color: var(--color-font-white);
+  background-color: var(--color-bg-gray);
 }
 
 .c-btn--white {

@@ -9,8 +9,8 @@
 ・管理者による勤怠の作成は一覧からではなく「登録」のような
 　ボタンから実行するようにする
 
-・AttendanceControllerの勤怠情報整形処理はparseを使って、
-　Carbonの中で完結できるかも
+・AttendanceControllerの勤怠情報整形処理はparseを使うことで
+　簡潔に記述できる
 
   （修正例）
 

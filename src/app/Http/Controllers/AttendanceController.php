@@ -402,18 +402,6 @@ class AttendanceController extends Controller
         }
 
         return view('admin_attendance_detail_create', compact('user', 'date'));
-
-        // // 勤怠情報の登録
-        // $attendance = Attendance::create([
-        //     'user_id' => $user->id,
-        //     'date' => $date,
-        //     'status' => Attendance::OFF_DUTY[0],
-        // ]);
-
-        // if (auth('admin')->check()) {
-        //     return redirect()->route('admin-attendance.show', $attendance->id);
-        // }
-        // return redirect()->route('attendance.show', $attendance->id);
     }
 
     /**
@@ -513,8 +501,6 @@ class AttendanceController extends Controller
 
                 // 勤怠情報の取得
                 $attendance = Attendance::with('user')->find($id);
-
-                // 修正が必要かも
                 $attendance->date = $attendance->toJapaneseDate($attendance->date);
                 $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
                 $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
@@ -534,8 +520,7 @@ class AttendanceController extends Controller
 
                 $isApplicable = false;
 
-                // 修正が必要かも
-                $request->date = $request->dateFormatConvert($request->attendance->date);
+                $request->date = $request->toJapaneseDate($request->attendance->date);
                 $request->start_time = $request->timeFormatConvert($request->start_time);
                 $request->end_time = $request->timeFormatConvert($request->end_time);
 

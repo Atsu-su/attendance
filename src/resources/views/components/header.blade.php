@@ -1,10 +1,9 @@
 <div id="header">
   <img class="logo" src="{{ asset('img/logo.svg') }}" alt="carmeriのロゴ">
-  @if (auth('admin')->check() || (auth('web')->check() && !request()->is('email/verify')))
+  @if (!(request()->is('admin/login') || request()->is('login') || request()->is('email/verify') ))
     <nav class="nav">
-
       {{-- 管理者用 --}}
-      @if (auth('admin')->check())
+      @if (request()->is('admin/*') )
         <a class="nav-link" href="{{ route('admin-attendance.show-daily-list', ['year' =>  request()->year, 'month' =>  request()->month, 'day' =>  request()->day]) }}">勤怠一覧</a>
         <a class="nav-link" href="{{ route('admin-staff.show-list') }}">スタッフ一覧</a>
         <a class="nav-link" href="{{ route('admin-stamp-correction-request.index') }}">申請一覧</a>
@@ -12,10 +11,8 @@
           @csrf
           <button class="nav-link" type="submit">ログアウト</button>
         </form>
-      @endif
-
+      @else
       {{-- ユーザ用 --}}
-      @if (auth('web')->check())
         <a class="nav-link" href="{{ route('attendance.register') }}">勤怠</a>
         <a class="nav-link" href="{{ route('attendance.show-list', ['year' => request()->year, 'month' => request()->month]) }}">勤怠一覧</a>
         <a class="nav-link" href="{{ route('stamp-correction-request.index') }}">申請</a>
@@ -24,14 +21,12 @@
           <button class="nav-link" type="submit">ログアウト</button>
         </form>
       @endif
-
     </nav>
     <nav class="nav-hamburger">
       <div id="svg" class="nav-hamburger-svg"></div>
       <div id="menu" class="nav-hamburger-menu js-hidden">
-
         {{-- 管理者用 --}}
-        @if (auth('admin')->check())
+        @if (request()->is('admin/*'))
           <a class="nav-link" href="{{ route('admin-attendance.show-daily-list', ['year' =>  request()->year, 'month' =>  request()->month, 'day' =>  request()->day]) }}">勤怠一覧</a>
           <a class="nav-link" href="{{ route('admin-staff.show-list') }}">スタッフ一覧</a>
           <a class="nav-link" href="{{ route('admin-stamp-correction-request.index') }}">申請一覧</a>
@@ -39,10 +34,8 @@
             @csrf
             <button class="nav-link" type="submit">ログアウト</button>
           </form>
-        @endif
-
+        @else
         {{-- ユーザ用 --}}
-        @if (auth('web')->check())
           <a class="nav-link" href="{{ route('attendance.register') }}">勤怠</a>
           <a class="nav-link" href="{{ route('attendance.show-list', ['year' => request()->year, 'month' => request()->month]) }}">勤怠一覧</a>
           <a class="nav-link" href="{{ route('stamp-correction-request.index') }}">申請</a>
@@ -51,7 +44,6 @@
             <button class="nav-link" type="submit">ログアウト</button>
           </form>
         @endif
-
       </div>
     </nav>
   @endif

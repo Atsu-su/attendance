@@ -8,7 +8,7 @@
     <div class="l-container-60">
       @if ($isApplicableForDate)
         @if ($isApplicable)
-        <h1 class="c-title">勤怠詳細<span>（申請）</span></h1>
+        <h1 class="c-title">勤怠詳細</h1>
           @if (auth('admin')->check())
             <form action="{{ route('admin-stamp-correction-request.store', $attendance->id) }}" method="post">
           @else
@@ -70,7 +70,7 @@
             {{-- @include('components.modal_confirm') --}}
           </form>
         @else
-          <h1 class="c-title">勤怠詳細<span>（承認待ち）</span></h1>
+          <h1 class="c-title">勤怠詳細</h1>
           <table class="c-table-detail request-content-table">
             <tr>
               <th>名前</th>

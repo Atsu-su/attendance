@@ -117,7 +117,7 @@ Route::middleware('date')->group(function () {
         Route::post('stamp_correction_request/{id}', [StampCorrectionRequestController::class, 'store'])
             ->whereNumber('id')         // {id}は数字のみ許可
             ->name('stamp-correction-request.store');
-        Route::get('stamp-correction-request/{stamp_correction_request}', [StampCorrectionRequestController::class, 'show'])
+        Route::get('stamp_correction_request/{stamp_correction_request}', [StampCorrectionRequestController::class, 'show'])
             ->whereNumber('stamp_correction_request')         // {stamp_correction_request}は数字のみ許可
             ->name('stamp-correction-request.show');
     });

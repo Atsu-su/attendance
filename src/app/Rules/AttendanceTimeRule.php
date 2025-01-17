@@ -42,6 +42,6 @@ class AttendanceTimeRule implements Rule
      */
     public function message()
     {
-        return '出勤時間もしくは退勤時間が不適切な値です ';
+        return '出勤時間もしくは退勤時間が不適切な値です';
     }
 }

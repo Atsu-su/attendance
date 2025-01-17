@@ -6,11 +6,7 @@
 @section('content')
   <div id="attendance-detail" class="cmn-page">
     <div class="l-container-60">
-      @if ($request->is_approved)
-        <h1 class="c-title">勤怠詳細（承認済）</h1>
-      @else
-        <h1 class="c-title">勤怠詳細（承認待ち）</h1>
-      @endif
+      <h1 class="c-title">勤怠詳細</h1>
       <table class="c-table-detail request-content-table">
         <tr>
           <th>名前</th>
@@ -40,6 +36,8 @@
           @csrf
           <button class="button c-btn c-btn--black c-btn--attendance-correction" type="submit">承認</button>
         </form>
+      @elseif (auth('admin')->check() && $request->is_approved)
+        <p class="button c-btn c-btn--gray c-btn--attendance-correction" type="submit">承認済み</p>
       @endif
     </div>
   </div>
