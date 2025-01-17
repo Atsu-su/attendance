@@ -8,3 +8,28 @@
 
 ・管理者による勤怠の作成は一覧からではなく「登録」のような
 　ボタンから実行するようにする
+
+・AttendanceControllerの勤怠情報整形処理はparseを使って、
+　Carbonの中で完結できるかも
+
+  （修正例）
+
+  $startTime = Carbon::parse($data['attendance']['start_time']);
+  $endTime = Carbon::parse($data['attendance']['end_time']);
+  $breakStartTime = Carbon::parse($data['break']['start_time']);
+  $breakEndTime = Carbon::parse($data['break']['end_time']);
+
+  （修正先）
+
+  // -------------------
+  // 滞在時間の計算
+  // -------------------
+  $startTime = $attendance->start_time === null ? null : Carbon::createFromFormat('H:i', $attendance->start_time);
+  $endTime = $attendance->end_time === null ? null : Carbon::createFromFormat('H:i', $attendance->end_time);
+  $timeInOffice = ($startTime === null || $endTime === null) ? null : $startTime->diffInMinutes($endTime);
+
+  // -------------------
+  // 休憩時間の計算
+  // -------------------
+  $totalBreakTime = 0;
+  $breakTimes = $attendance->breakTimes;

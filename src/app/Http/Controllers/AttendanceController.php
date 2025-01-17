@@ -513,6 +513,8 @@ class AttendanceController extends Controller
 
                 // 勤怠情報の取得
                 $attendance = Attendance::with('user')->find($id);
+
+                // 修正が必要かも
                 $attendance->date = $attendance->toJapaneseDate($attendance->date);
                 $attendance->start_time = $attendance->start_time === null ? null : $attendance->timeFormatConvert($attendance->start_time);
                 $attendance->end_time = $attendance->end_time === null ? null : $attendance->timeFormatConvert($attendance->end_time);
@@ -532,6 +534,7 @@ class AttendanceController extends Controller
 
                 $isApplicable = false;
 
+                // 修正が必要かも
                 $request->date = $request->dateFormatConvert($request->attendance->date);
                 $request->start_time = $request->timeFormatConvert($request->start_time);
                 $request->end_time = $request->timeFormatConvert($request->end_time);
